@@ -21,5 +21,6 @@ public class Othello_Game {
         GameWindow gameWindow = new GameWindow("Othello Game Manager", controller);
         controller.setView(gameWindow);
         gameWindow.setVisible(true);
+        
     }
 }
