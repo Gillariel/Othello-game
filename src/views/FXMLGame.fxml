@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.paint.*?>
+<?import javafx.scene.shape.*?>
 <?import java.lang.*?>
 <?import java.util.*?>
 <?import javafx.scene.*?>
@@ -8,9 +10,9 @@
 
 <AnchorPane id="AnchorPane" prefHeight="464.0" prefWidth="639.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="views.FXMLGameController">
    <children>
-      <Pane fx:id="gamePane" layoutX="1.0" prefHeight="464.0" prefWidth="640.0">
+      <Pane fx:id="gamePane" layoutX="1.0" prefHeight="700.0" prefWidth="850.0">
          <children>
-            <GridPane fx:id="gridPane" gridLinesVisible="true" layoutX="152.0" layoutY="34.0" prefHeight="382.0" prefWidth="463.0">
+            <GridPane fx:id="gridPane" gridLinesVisible="true" layoutX="71.0" layoutY="192.0" prefHeight="382.0" prefWidth="463.0">
               <columnConstraints>
                 <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
                   <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
@@ -32,10 +34,42 @@
                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
               </rowConstraints>
             </GridPane>
-            <Label layoutX="14.0" layoutY="70.0" text="Black's pawns :" />
-            <Label layoutX="14.0" layoutY="133.0" text="White's pawns :" />
-            <Label fx:id="blackPawnsLabel" layoutX="96.0" layoutY="70.0" />
-            <Label fx:id="whitePawnsLabel" layoutX="103.0" layoutY="133.0" text="Label" />
+            <Label fx:id="leaderLaber" layoutX="287.0" layoutY="152.0" prefHeight="17.0" prefWidth="36.0" text="Leader" />
+            <MenuBar fx:id="menuBar" layoutY="-1.0">
+              <menus>
+                <Menu fx:id="optionMenu" mnemonicParsing="false" text="Option">
+                  <items>
+                        <MenuItem fx:id="saveGameMenuItem" mnemonicParsing="false" onAction="#handleSaveGame" text="Save game" />
+                    <MenuItem fx:id="closeGameMenuItem" mnemonicParsing="false" onAction="#handleCloseGame" text="Close Game" />
+                  </items>
+                </Menu>
+                <Menu fx:id="aboutMenuItem" mnemonicParsing="false" onAction="#handleAbout" text="About" />
+                <Menu fx:id="helpMenu" mnemonicParsing="false" text="Help">
+                  <items>
+                    <MenuItem fx:id="RulesMenuItem" mnemonicParsing="false" onAction="#handleRules" text="Rules" />
+                  </items>
+                </Menu>
+              </menus>
+            </MenuBar>
+            <Circle fx:id="blackPawnsCircle" layoutX="183.0" layoutY="102.0" radius="32.0" stroke="BLACK" strokeType="INSIDE">
+               <fill>
+                  <LinearGradient endX="1.0" endY="1.0">
+                     <stops>
+                        <Stop color="BLACK" />
+                        <Stop color="WHITE" offset="1.0" />
+                     </stops>
+                  </LinearGradient>
+               </fill>
+            </Circle>
+            <ProgressBar fx:id="blackPawnProgressBar" layoutX="107.0" layoutY="151.0" prefHeight="18.0" prefWidth="152.0" progress="0.0" />
+            <Circle fx:id="whitePawnsCircle" fill="#fffff2" layoutX="436.0" layoutY="102.0" radius="32.0" stroke="BLACK" strokeType="INSIDE" />
+            <ProgressBar fx:id="whitePawnProgressBar" layoutX="349.0" layoutY="152.0" prefHeight="18.0" prefWidth="152.0" progress="0.0" />
+            <TableView fx:id="scoreTableView" layoutX="581.0" layoutY="266.0" prefHeight="200.0" prefWidth="152.0">
+              <columns>
+                <TableColumn fx:id="scoreJoueur1Column" prefWidth="75.0" text="Pseudo J1" />
+                <TableColumn fx:id="scoreJoueur2Column" prefWidth="75.0" text="Pseudo J2" />
+              </columns>
+            </TableView>
          </children>
       </Pane>
    </children>
