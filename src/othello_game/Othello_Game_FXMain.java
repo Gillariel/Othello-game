@@ -6,16 +6,11 @@
 package othello_game;
 
 import javafx.application.Application;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
 import javafx.scene.image.Image;
-import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
-import javafx.stage.WindowEvent;
 
 /**
  *
@@ -32,8 +27,8 @@ public class Othello_Game_FXMain extends Application {
         scene.getStylesheets().add(getClass().getResource("/ressources/ProgressBar.css").toExternalForm());
         stage.setScene(scene);
         stage.getIcons().add(new Image("http://swap.sec.net/annex/icon.png"));
-          
         
+        //stage.setFullScreen(true);
         stage.setTitle("Othello - Game");
         stage.show(); 
     }
