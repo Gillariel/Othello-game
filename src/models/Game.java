@@ -98,7 +98,7 @@ public class Game {
 		cpt++;
             }
 		
-	// enregistre les lignes et colonnes par rapport aux  coordonnées des cases.
+	// enregistre les lignes et colonnes par rapport aux coordonnées des cases.
 	int ligne = 1;
 	for (int i = 0; i < 64; i++){
             if (i > 7 ) ligne = 2;
@@ -122,73 +122,7 @@ public class Game {
         for (int i = 0; i < 32; i++){
             lignePris[i] = 0;
             colonnePris[i] = -0;
-	}
-	initialiseTableauPoint();	
-    }	
-	
-    public  void initialiseTableauPoint() {
-	// mémorise le nombre de points de chaque case.
-	pointCase = new int[][] {
-            { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},		
-            {-1, 1000, 100, 700, 400, 400, 700, 100, 1000, -1},
-            {-1, 100, 0, 310, 310, 310, 310, 0, 100, -1},
-            {-1, 700, 310, 350, 325, 325, 350, 310, 700, -1},
-            {-1, 400, 310, 325, 500, 500, 325, 310, 400, -1},
-            {-1, 400, 310, 325, 500, 500, 325, 310, 400, -1},
-            {-1, 700, 310, 350, 325, 325, 350, 310, 700, -1},
-       	    {-1, 100, 0, 310, 310, 310, 310, 0, 100, -1},
-            {-1, 1000, 100, 700, 400, 400, 700, 100, 1000, -1},
-            { -1, -1, -1, -1, -1, -1, -1, -1, -1, -1}
-        };
-    }
-	
-    // si on possède les coins, on change la valeur des cases qui se 
-    // trouve à proximité car elles deviennent favorables.
-    public void modifiePoint() {
-	if (joueurEnCours() == 1) {
-            if (casesPlateau[1][1] == noir) {
-		pointCase[1][2] = 1000;
-		pointCase[2][1] = 1000;
-		pointCase[2][2] = 1000;
-            }
-            if (casesPlateau[1][8] == noir) {
-		pointCase[1][7] = 1000;
-                pointCase[2][8] = 1000;
-		pointCase[2][7] = 1000;
-            }
-            if (casesPlateau[8][1] == noir) {
-		pointCase[7][1] = 1000;
-		pointCase[7][2] = 1000;
-		pointCase[8][2] = 1000;
-            }
-            if (casesPlateau[8][8] == noir) {
-                pointCase[7][8] = 1000;
-		pointCase[7][7] = 1000;
-		pointCase[8][7] = 1000;
-            }
-	}
-	else if (joueurEnCours() == 2) {
-            if (casesPlateau[1][1] == blanc) {
-		pointCase[1][2] = 1000;
-		pointCase[2][1] = 1000;
-		pointCase[2][2] = 1000;
-            }
-            if (casesPlateau[1][8] == blanc) {
-		pointCase[1][7] = 1000;
-		pointCase[2][8] = 1000;
-		pointCase[2][7] = 1000;
-            }
-            if (casesPlateau[8][1] == blanc) {
-		pointCase[7][1] = 1000;
-		pointCase[7][2] = 1000;
-		pointCase[8][2] = 1000;
-            }
-            if (casesPlateau[8][8] == blanc) {
-		pointCase[7][8] = 1000;
-		pointCase[7][7] = 1000;
-		pointCase[8][7] = 1000;
-            }
-	}
+	}	
     }	
 		
     /** INITIALISE  UNE  PARTIE **/	
@@ -386,99 +320,20 @@ public class Game {
 	mod.caseJouer = caseJouer;	
 	return mod;
     }
-	
-	
-    /**   GESTION    DE  L'HISTORIQUE      */	
-    public void sauvegarderModele() { listeModele[numeroModele] = copier(); }
-	
-    public void chargerModelePrecedent() {
-	numeroModele--;
-	// récupère les statuts des  cases
-	for (int i = 1; i < 9; i++)
-            for (int j = 1; j < 9; j++)
-		casesPlateau[i][j] = listeModele[numeroModele].statutJeu[i][j];
-	// récupère le joueurs en cours
-	joueurEnCours = listeModele[numeroModele].joueurEnCours;
-	// récupère les points
-	compteurBlanc = listeModele[numeroModele].compteurBlanc;
-	compteurNoir = listeModele[numeroModele].compteurNoir;
-        // récupère la case joué
-	caseJouer = listeModele[numeroModele].caseJouer;
-    }
-	
-    public void chargerModeleSuivant() {
-	numeroModele++;	
-	// récupère les statuts des  cases
-        for (int i = 1; i < 9; i++)
-            for (int j = 1; j < 9; j++)
-		casesPlateau[i][j] = listeModele[numeroModele].statutJeu[i][j];
-	// récupère le joueurs en cours
-	joueurEnCours = listeModele[numeroModele].joueurEnCours;
-	// récupère les points
-	compteurBlanc = listeModele[numeroModele].compteurBlanc;
-	compteurNoir = listeModele[numeroModele].compteurNoir;
-	// récupère la case joué
-	caseJouer = listeModele[numeroModele].caseJouer;
-    }
-	
-    public void chargerUnModele(int unModele) {
-        // récupère les statuts des  cases
-	for (int i = 1; i < 9; i++)
-            for (int j = 1; j < 9; j++)
-		casesPlateau[i][j] = listeModele[unModele].statutJeu[i][j];
-	// récupère le joueurs en cours
-	joueurEnCours = listeModele[unModele].joueurEnCours;
-	// récupère les points
-	compteurBlanc = listeModele[unModele].compteurBlanc;
-	compteurNoir = listeModele[unModele].compteurNoir;
-	// récupère la case joué
-	caseJouer = listeModele[unModele].caseJouer;
-    }
-
-    public void chargeModeleQuelconque(Game modele) {
-        // récupère les statuts des  cases
-        for (int i = 1; i < 9; i++)
-            for (int j = 1; j < 9; j++)
-		casesPlateau[i][j] = modele.statutJeu[i][j];
-        // récupère le joueurs en cours
-        joueurEnCours = modele.joueurEnCours;
-        // récupère les points
-	compteurBlanc = modele.compteurBlanc;
-	compteurNoir = modele.compteurNoir;
-	// récupère la case joué
-	caseJouer = modele.caseJouer;
-    }
-	
-    public boolean aRejouerDansHistorique() {
-	boolean aRejouer = false;
-	if (listeModele[numeroModele+1] != null)
-            aRejouer = true;
-	return aRejouer;
-    }
-
-    public void reinitialiseListeModele(int indice) {
-	for (int  i = indice + 1; i < 61; i++)
-            listeModele[i] = null;
-    }		
-
+		
     public void sauvegardeJeux(String nomSauvegarde) {
 	int compteur = 0;
-	try {
-            // ouverture d'un flux de sortie vers un fichier
-            FileOutputStream fluxSortieFichier = new FileOutputStream("sauvegarde/"+nomSauvegarde+".sav");
-            // création d'un "flux objet" avec le flux fichier
+	try  {
+            FileOutputStream fluxSortieFichier = new FileOutputStream("save/" + nomSauvegarde + ".sav");
             ObjectOutputStream fluxSortieObjet= new ObjectOutputStream(fluxSortieFichier);
             try {
 		while (compteur < 61) {
-                    // sérialisation : écriture de l'objet dans le flux de sortie
                     fluxSortieObjet.writeObject(listeModele[compteur]); 
                     compteur++;
 		}
 		fluxSortieObjet.write(numeroModele);
-		// on vide le tampon
 		fluxSortieObjet.flush();		
             } finally {
-            //fermeture des flux
                 try {
                     fluxSortieObjet.close();
 		} finally {
@@ -527,11 +382,10 @@ public class Game {
 	int autreCouleur = 0;	
 
 	// récupère la couleur du joueur en cours et celle de l'autre joueur
-	if ( joueurEnCours() == 1) {
+	if (joueurEnCours() == 1) {
             couleur = noir;
             autreCouleur = blanc;
-	}
-	else if ( joueurEnCours() == 2) {
+	}else if(joueurEnCours() == 2) {
             couleur = blanc;
             autreCouleur = noir; 
 	}
@@ -550,321 +404,6 @@ public class Game {
 		if (jnPeutPlusJouer() == true) joueurEnCours = 2;
             } 
 	}
-    }
-
-	
-    /** Gestion  recherche  MINMAX  */
-    int compteur;
-	
-    public int calcIA(int prof) {
-        compteur = 0;
-	int i,j,tmp;
-	int max = MINEVAL;
-	int maxi=-1, maxj=-1;
-	int couleur = 0;
-        int autreCouleur = 0;
-        
-        if (joueurEnCours() == 1) {
-            couleur = noir;
-            autreCouleur = blanc;
-	}
-	else if (joueurEnCours() == 2) {
-            couleur = blanc;
-            autreCouleur = noir;
-	}
-		
-        // teste si une des cases en coins est jouable
-	// si c'est le cas, on le joue
-	if (placementCorrect(1, 1, blanc, noir, false))
-            return getNumeroCase(1, 1);
-
-	if (placementCorrect(8, 8, blanc, noir, false))
-            return getNumeroCase(8, 8);
-
-        if (placementCorrect(1, 8, blanc, noir, false))
-            return getNumeroCase(1, 8);
-
-        if (placementCorrect(8, 1, blanc, noir, false))
-            return getNumeroCase(8, 1);
-
-		
-	//Si la profondeur est nulle ou la partie est finie,
-	//on ne fait pas le calcul
-	if((prof > 0) && (compteurBlanc + compteurNoir) < 64) {
-	    //On parcourt les cases du morpion
-	    for(i=1; i<9; i++)
-	        for(j=1; j<9;j++) {
-	            //Si la case est vide
-	            if (placementCorrect(i, j, couleur, autreCouleur, false)) {
-	                Game modeleTmp = copier();	
-	                //On simule qu'on joue cette case
-	                jouerUnCoup(getNumeroCase(i, j));
-	                //On appelle la fonction calcMin pour lancer l'IA
-	                tmp = calcMin(prof-1);
-	                //Si ce score est plus grand
-	                if (tmp >= max) {
-	                    //On le choisit
-	                    max = tmp;
-	                    maxi = i;
-	                    maxj = j;
-	                }
-	                //On annule le coup
-	                chargeModeleQuelconque(modeleTmp);
-	            }
-	        }
-	}
-	//on retourne la meilleure case
-        return getNumeroCase(maxi, maxj);	
-    }
-	
-    public int calcMax(int prof) {
-	compteur++;
-	int i,j,tmp;
-	int max = MINEVAL;
-	int couleur = 0;
-	int autreCouleur = 0;
-	boolean nePeutPasJouer = true;
-	System.out.println("nbCoup : "+compteur);
-		
-	if (joueurEnCours() == 1) {
-            couleur = noir;
-            autreCouleur = blanc;
-	}
-	else if (joueurEnCours() == 2) {
-            couleur = blanc;
-            autreCouleur = noir;
-	}
-
-	//Si on est à la profondeur voulue ou que la partie est finie, on retourne l'évaluation
-	if((prof == 0) || (compteurBlanc + compteurNoir) >= 64)
-	    return evalue();
-
-	//On parcourt le plateau de jeu et on le joue si la case est vide
-	for(i = 1; i < 9; i++)
-	    for(j = 1; j < 9; j++) {
-	        if(placementCorrect(i, j, couleur, autreCouleur, false)) {
-	            Game modeleTmp1 = copier();
-	            //On joue le coup
-	            jouerUnCoup(getNumeroCase(i, j));
-	            tmp = calcMin(prof-1);
-	            if(tmp > max) {
-	                max = tmp;
-	            }
-	                
-                    //On annule le coup
-	            chargeModeleQuelconque(modeleTmp1);
-	            nePeutPasJouer = false;
-	        }
-	    }
-	if(nePeutPasJouer) 
-            changeTourJoueur();
-	    
-        return max;
-    }
-
-    public int calcMin(int prof) {
-	compteur++;
-	int i,j,tmp;
-	int min = MAXEVAL;
-	int couleur = 0;
-        int autreCouleur = 0;
-	boolean nePeutPasJouer = true;
-	System.out.println("nbCoup : "+compteur);
-		
-	if (joueurEnCours() == 1) {
-            couleur = noir;
-            autreCouleur = blanc;
-	}
-	else if (joueurEnCours() == 2) {
-            couleur = blanc;
-            autreCouleur = noir;
-	}
-
-	//Si on est à la profondeur voulue ou que la partie est finie, on retourne l'évaluation
-	if((prof == 0) || (compteurBlanc + compteurNoir) >= 64)
-	    return evalue();
-	//On parcourt le plateau de jeu et on le joue si la case est vide
-	for(i = 1; i < 9; i++)
-	    for(j = 1; j < 9; j++) {
-	        if(placementCorrect(i, j, couleur, autreCouleur, false)) {
-	            Game modeleTmp2 = copier();
-	            //On joue le coup
-	            jouerUnCoup(getNumeroCase(i, j));
-	            tmp = calcMax(prof-1);
-	            if(tmp < min) {
-	                min = tmp;
-	            }
-	            //On annule le coup
-	            chargeModeleQuelconque(modeleTmp2);
-	            nePeutPasJouer = false;
-	        }
-	    }
-	
-        if(nePeutPasJouer)
-            changeTourJoueur();
-	    
-        return min;
-    }
-	
-	
-    public int evalue() {
-	int score = 0;
-	calculScore();
-		
-	// si la partie est finie
-	if ((compteurBlanc + compteurNoir) >= 64) {
-            if (compteurBlanc > compteurNoir ) return score =  100000 - (compteurBlanc - compteurNoir);
-            else if (compteurBlanc < compteurNoir) return score =  -100000 + (compteurNoir - compteurBlanc);
-            else  return score = 0;
-	}
-		
-	// sinon on met à jour le tableau des points puis on fait le compte
-	modifiePoint();		
-	for (int i = 1; i < 9; i++)
-            for (int j = 1; j < 9; j++) {
-                if (casesPlateau[i][j] == noir || casesPlateau[i][j] == prisParNoir)
-                    score -= pointCase[i][j];
-                else if (casesPlateau[i][j] == blanc || casesPlateau[i][j] == prisParBlanc)
-                    score += pointCase[i][j];
-            }
-        
-        // si blanc possède les cases du bord
-	for (int i = 1; i < 9; i++)
-            if (casesPlateau[i][1] == blanc ||  casesPlateau[i][1] == prisParBlanc)
-                score += 1000;
-	for (int i = 1; i < 9; i++)
-            if (casesPlateau[i][8] == blanc ||  casesPlateau[i][1] == prisParBlanc)
-		score += 1000;
-	for (int i = 1; i < 9; i++)
-            if (casesPlateau[1][i] == blanc ||  casesPlateau[i][1] == prisParBlanc)
-		score += 1000;
-	for (int i = 1; i < 9; i++)
-            if (casesPlateau[8][i] == blanc ||  casesPlateau[i][1] == prisParBlanc)
-		score += 1000;
-		
-        // si noir a des coins on diminu le score
-	if (casesPlateau[1][1] == noir)
-            score -= 5000;
-        if (casesPlateau[1][8] == noir)
-            score -= 5000;
-	if (casesPlateau[8][1] == noir)
-            score -= 5000;
-	if (casesPlateau[8][8] == noir)
-            score -= 5000;
-		
-	// si c'est lIA qui les a on augemente le score
-	if (casesPlateau[1][1] == blanc)
-            score += 5000;
-	if (casesPlateau[1][8] == blanc)
-            score += 5000;
-	if (casesPlateau[8][1] == blanc)
-            score += 5000;
-        if (casesPlateau[8][8] == blanc)
-            score += 5000;
-		
-	// si noir possède les coins au centre
-	if (casesPlateau[3][3] == noir)
-            score -= 2500;
-	if (casesPlateau[3][6] == noir)
-            score -= 2500;
-	if (casesPlateau[6][3] == noir)
-            score -= 2500;
-	if (casesPlateau[6][6] == noir)
-            score -= 2500;
-		
-	// si blanc possède les coins au centre
-	if (casesPlateau[3][3] == blanc)
-            score += 2500;
-	if (casesPlateau[3][6] == blanc)
-            score += 2500;
-	if (casesPlateau[6][3] == blanc)
-            score += 2500;
-	if (casesPlateau[6][6] == blanc)
-            score += 2500;
-			
-		
-	// si  noir possède les 3 cases en coins
-	if (pointCase[1][1] == noir && ( pointCase[1][2] == noir || pointCase[1][2] == prisParNoir) 	
-        && (pointCase[2][1] == noir || pointCase[2][1] == prisParNoir ))
-            score -= 10000;
-		
-        if (casesPlateau[1][8] == noir && (pointCase[1][7] == noir || pointCase[1][7] == prisParNoir) 
-        && (pointCase[2][8] == noir || pointCase[2][8] == prisParNoir));
-            score -= 10000;
-			
-	if (casesPlateau[8][1] == noir && (pointCase[7][1] == noir || pointCase[7][1] == prisParNoir )
-	&& (pointCase[7][2] == noir || pointCase[7][2] == prisParNoir))
-            score -= 10000;
-		
-	if (casesPlateau[8][8] == noir && (pointCase[7][8] == noir || pointCase[7][8] == prisParNoir) 
-	&& (pointCase[7][7] == noir || pointCase[7][7] == prisParNoir ));
-            score -= 10000;
-			
-            
-	// si noir les 4 cases de coins 
-	if (pointCase[1][1] == noir && ( pointCase[1][2] == noir || pointCase[1][2] == prisParNoir) 	
-	&& (pointCase[2][1] == noir || pointCase[2][1] == prisParNoir )
-	&& (pointCase[2][2] == noir || pointCase[2][2] == prisParNoir))
-            score -= 15000;
-		
-	if (casesPlateau[1][8] == noir && (pointCase[1][7] == noir || pointCase[1][7] == prisParNoir) 
-	&& (pointCase[2][8] == noir || pointCase[2][8] == prisParNoir)
-	&& (pointCase[2][7] == noir || pointCase[2][7] == prisParNoir));
-            score -= 15000;
-			
-	if (casesPlateau[8][1] == noir && (pointCase[7][1] == noir || pointCase[7][1] == prisParNoir )
-	&& (pointCase[7][2] == noir || pointCase[7][2] == prisParNoir)
-	&& (pointCase[7][2] == noir || pointCase[7][2] == prisParNoir) )
-            score -= 15000;
-		
-        if (casesPlateau[8][8] == noir && (pointCase[7][8] == noir || pointCase[7][8] == prisParNoir) 
-	&& (pointCase[7][7] == noir || pointCase[7][7] == prisParNoir ) 
-	&& (pointCase[7][7] == noir || pointCase[7][7] == prisParNoir));
-            score -= 15000;
-					
-	// si  blanc possède les 3 cases en coins
-        if (pointCase[1][1] == blanc && ( pointCase[1][2] == blanc || pointCase[1][2] == prisParBlanc) 	
-        && (pointCase[2][1] == blanc || pointCase[2][1] == prisParBlanc ))
-            score += 10000;
-		
-	if (casesPlateau[1][8] == blanc && (pointCase[1][7] == blanc || pointCase[1][7] == prisParBlanc) 
-	&& (pointCase[2][8] == blanc || pointCase[2][8] == prisParBlanc));
-            score += 10000;
-			
-	if (casesPlateau[8][1] == blanc && (pointCase[7][1] == blanc || pointCase[7][1] == prisParBlanc )
-	&& (pointCase[7][2] == blanc || pointCase[7][2] == prisParBlanc) )
-            score += 10000;
-		
-	if (casesPlateau[8][8] == blanc && (pointCase[7][8] == blanc || pointCase[7][8] == prisParBlanc) 
-        && (pointCase[7][7] == blanc || pointCase[7][7] == prisParBlanc ));
-            score += 10000;
-						
-	// si blanc les 4 cases de coins 
-	if (pointCase[1][1] == blanc && ( pointCase[1][2] == blanc || pointCase[1][2] == prisParBlanc) 	
-	&& (pointCase[2][1] == blanc || pointCase[2][1] == prisParBlanc )
-	&& (pointCase[2][2] == blanc || pointCase[2][2] == prisParBlanc))
-            score += 15000;
-		
-	if (casesPlateau[1][8] == blanc && (pointCase[1][7] == blanc || pointCase[1][7] == prisParBlanc) 
-        && (pointCase[2][8] == blanc || pointCase[2][8] == prisParBlanc)
-	&& (pointCase[2][7] == blanc || pointCase[2][7] == prisParBlanc));
-            score += 15000;
-			
-	if (casesPlateau[8][1] == blanc && (pointCase[7][1] == blanc || pointCase[7][1] == prisParBlanc )
-        && (pointCase[7][2] == blanc || pointCase[7][2] == prisParBlanc)
-        && (pointCase[7][2] == blanc || pointCase[7][2] == prisParBlanc) )
-            score += 15000;
-		
-	if (casesPlateau[8][8] == blanc && (pointCase[7][8] == blanc || pointCase[7][8] == prisParBlanc) 
-	&& (pointCase[7][7] == blanc || pointCase[7][7] == prisParBlanc ) 
-	&& (pointCase[7][7] == blanc || pointCase[7][7] == prisParBlanc));
-            score += 15000;
-
-		
-	// réinitialise le tableau des points
-	initialiseTableauPoint();
-			
-	return score;
     }
     
     public void randomFirstPlayer() {

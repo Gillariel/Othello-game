@@ -102,21 +102,16 @@ public class FXMLGameController implements Initializable {
         for(int i = 0; i < 8; i++) {
             for(int j = 0; j < 8; j++) {
                 if(i == 3 && j == 3 || i == 4 && j == 4)
-                    gridPane.add(new HBox(new ImageView(iconBlack)), i, j);
-                else if(i == 3 && j == 4 || i == 4 && j == 3)
                     gridPane.add(new HBox(new ImageView(iconWhite)), i, j);
+                else if(i == 3 && j == 4 || i == 4 && j == 3)
+                    gridPane.add(new HBox(new ImageView(iconBlack)), i, j);
                 else
                     gridPane.add(new HBox(new ImageView(iconEmpty)), i, j);
-                
-                /*getNodeByRowColumnIndex(i, j, gridPane).setOnMouseClicked((MouseEvent event) -> {
-                    game.jouerUnCoup(getCurrentX() + getCurrentY());
-                });*/
             }
         }
         
         for(Node n : gridPane.getChildren())
             n.addEventFilter(MouseEvent.MOUSE_PRESSED, event -> System.out.println( "Node: " + n + " at " + GridPane.getRowIndex(n) + "/" + GridPane.getColumnIndex(n))); 
-        
     }    
     
     public Game getGame() {return game; }
@@ -143,15 +138,4 @@ public class FXMLGameController implements Initializable {
           AppInfo.showRules();
     }
     
-    private Node getNodeByRowColumnIndex(final int row,final int column,GridPane gridPane) {
-        Node result = null;
-        ObservableList<Node> childrens = gridPane.getChildren();
-        for(Node node : childrens) {
-            if(gridPane.getRowIndex(node) == row && gridPane.getColumnIndex(node) == column) {
-                result = node;
-                break;
-            }
-        }
-        return result;
-    }
 }
