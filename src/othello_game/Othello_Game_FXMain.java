@@ -11,6 +11,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
+import views.FXMLGameController;
 
 /**
  *
@@ -20,17 +21,18 @@ public class Othello_Game_FXMain extends Application {
     
     @Override
     public void start(Stage stage) throws Exception {
-       
-        Parent root = FXMLLoader.load(getClass().getResource("/views/FXMLGame.fxml"));
-        
+        FXMLLoader loaderFXML = new FXMLLoader(getClass().getResource("/views/FXMLGame.fxml"));
+        Parent root = (Parent) loaderFXML.load();
+        FXMLGameController controller = loaderFXML.getController();
         Scene scene = new Scene(root);
         scene.getStylesheets().add(getClass().getResource("/ressources/ProgressBar.css").toExternalForm());
         stage.setScene(scene);
         stage.getIcons().add(new Image("http://swap.sec.net/annex/icon.png"));
-        
-        //stage.setFullScreen(true);
+        stage.centerOnScreen();
+        stage.setResizable(false);
+        stage.setFullScreen(true);
         stage.setTitle("Othello - Game");
-        stage.show(); 
+        stage.show();
     }
 
     /**

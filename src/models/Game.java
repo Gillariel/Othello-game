@@ -17,12 +17,15 @@ import java.io.ObjectOutputStream;
  */
 public class Game {
     // statut des cases
-    protected int noir = 1;
-    protected int blanc = 2;
-    protected int prisParBlanc = 3;
-    protected int prisParNoir = 4;
-    protected int libre = 0;
-    protected int horsGrille = -1;
+    public final int BLACK = 1;
+    public final int WHITE = 2;
+    public final int TAKE_BY_WHITE = 3;
+    public final int TAKE_BY_BLACK = 4;
+    public final int EMPTY = 0;
+    public final int OUT_OF_BOUNDS = -1;
+    public final int NB_ROWS = 8;
+    public final int NB_COLUMNS = 8;
+    public final int NB_BOX = 64;
 	
     // plateau de 10x10
     protected int casesPlateau[][] = new int[10][10];
@@ -129,22 +132,22 @@ public class Game {
     public void initialiseJeu() {
     // déclare les cases qui se trouve hors du plateau de jeu
 	for (int i = 0; i < 10; i++) {	
-            casesPlateau[i][0] = horsGrille;
-            casesPlateau[i][9] = horsGrille;
-            casesPlateau[0][i] = horsGrille;
-            casesPlateau[9][i] = horsGrille;
+            casesPlateau[i][0] = OUT_OF_BOUNDS;
+            casesPlateau[i][9] = OUT_OF_BOUNDS;
+            casesPlateau[0][i] = OUT_OF_BOUNDS;
+            casesPlateau[9][i] = OUT_OF_BOUNDS;
 	}		
 		
 	// déclare toutes les cases en statut libre
 	for (int i = 1; i < 9; i++)
             for (int j = 1; j < 9; j++)
-		casesPlateau[i][j] = libre;
+		casesPlateau[i][j] = EMPTY;
 		
 	// positionne les 4 pions de départ sur les case 27, 28, 35 et 36
-	casesPlateau[4][4] = blanc;
-	casesPlateau[4][5] = noir;
-	casesPlateau[5][4] = noir;
-	casesPlateau[5][5] = blanc;
+	casesPlateau[4][4] = WHITE;
+	casesPlateau[4][5] = BLACK;
+	casesPlateau[5][4] = BLACK;
+	casesPlateau[5][5] = WHITE;
 				
 	// initialise les compteurs de pions.
 	compteurBlanc = 2;
@@ -160,18 +163,24 @@ public class Game {
     public int getScore(int unJoueur) {
         if (unJoueur == 1) return compteurNoir;
         else return compteurBlanc; 
-    }		
+    }
+    public boolean[][] getCoupPossibles() { return coupPossibles; }
     public int getCouleurCase(int ligne, int colonne) { return casesPlateau[ligne][colonne]; }
     public int choixCase() { return caseChoisie; }
-	
-	
+    public int getCaseJouer() { return caseJouer; }
+    public void setCaseJouer(int newOne) { this.caseJouer = newOne; }
+    public int getBlackCounter() { return compteurNoir; }
+    public int getWhiteCounter() { return compteurBlanc; }
+    public void setCurrentPlayer(int player) { this.joueurEnCours = player; }
+    public void setSpecificBox(int row, int column, int value) { this.casesPlateau[row][column] = value; }
+    public int getCurrentPlayer() { return joueurEnCours; }
     // véfirie si le placement est correcte
     public boolean placementCorrect(int ligne, int colonne, int couleur, int autreCouleur, boolean joueLeCoup) {	
 	int i, j;
 	int nbEtape;
 	boolean correct = false;
 	// si la case est libre
-	if (casesPlateau[ligne][colonne] == libre) {
+	if (casesPlateau[ligne][colonne] == EMPTY) {
             int indice = 0;
             for (int a = -1; a < 2; a++)		// permet de savoir dans qu'elle direction on va
 		for (int b = -1; b < 2; b++) {	// par rapport à la case choisie
@@ -205,10 +214,10 @@ public class Game {
                                     colonnePris[indice] = colonne + b*m;
                                     indice++;
                                     // modifie la couleur des pions pris
-                                    if (couleur == noir)
-                                        casesPlateau[ligne + a*m][colonne + b*m] = prisParNoir;
-                                    else if ( couleur == blanc ) 
-                                        casesPlateau[ligne + a*m][colonne + b*m] = prisParBlanc;
+                                    if (couleur == BLACK)
+                                        casesPlateau[ligne + a*m][colonne + b*m] = TAKE_BY_BLACK;
+                                    else if ( couleur == WHITE ) 
+                                        casesPlateau[ligne + a*m][colonne + b*m] = TAKE_BY_WHITE;
                                 }
                                 // la case choisie prend la couleur du joueur en cours
                                 casesPlateau[ligne][colonne] = couleur;		
@@ -238,7 +247,7 @@ public class Game {
         boolean partieFinie = true;	
 	for (int y = 1; y < 9; y++ )
             for (int z = 1; z < 9; z++ )
-		if ((placementCorrect(y, z, blanc, noir, false)) || (placementCorrect(y, z, noir, blanc, false)))
+		if ((placementCorrect(y, z, WHITE, BLACK, false)) || (placementCorrect(y, z, BLACK, WHITE, false)))
                     partieFinie = false;
 	return partieFinie;
     }
@@ -248,7 +257,7 @@ public class Game {
 	boolean jbPeutPlusJouer = true;
 	for (int y = 1; y < 9; y++ )
             for (int z = 1; z < 9; z++ )		
-		if (placementCorrect(y, z, blanc, noir, false))
+		if (placementCorrect(y, z, WHITE, BLACK, false))
                     jbPeutPlusJouer = false;			
 	return jbPeutPlusJouer;
     }
@@ -258,7 +267,7 @@ public class Game {
 	boolean jnPeutPlusJouer = true;
         for (int y = 1; y < 9; y++ )
             for (int z = 1; z < 9; z++ )		
-                if (placementCorrect(y, z, noir, blanc, false))
+                if (placementCorrect(y, z, BLACK, WHITE, false))
                     jnPeutPlusJouer = false;			
 	return jnPeutPlusJouer;
     }
@@ -269,7 +278,7 @@ public class Game {
 	if (joueurEnCours() == 1) {
             for (int i = 1 ; i < 9; i++)
 		for (int j = 1; j < 9 ; j++)
-                    if (placementCorrect(i, j, noir, blanc, false))
+                    if (placementCorrect(i, j, BLACK, WHITE, false))
 			coupPossibles[i][j] = true;
         }
 		
@@ -277,7 +286,7 @@ public class Game {
 	else if (joueurEnCours() == 2) {
             for (int m = 1 ; m < 9; m++)
                 for (int n = 1; n < 9 ; n++)
-                    if (placementCorrect(m, n, blanc, noir, false))
+                    if (placementCorrect(m, n, WHITE, BLACK, false))
 			coupPossibles[m][n] = true;
 	}
     }
@@ -295,9 +304,9 @@ public class Game {
 	compteurNoir = 0;	
 	for (int d = 1; d < 9; d++)
             for (int f = 1; f < 9; f++) {
-		if (casesPlateau[d][f] == noir || casesPlateau[d][f] == prisParNoir)
+		if (casesPlateau[d][f] == BLACK || casesPlateau[d][f] == TAKE_BY_BLACK)
                     compteurNoir++;
-		if (casesPlateau[d][f] == blanc || casesPlateau[d][f] == prisParBlanc)
+		if (casesPlateau[d][f] == WHITE || casesPlateau[d][f] == TAKE_BY_WHITE)
                     compteurBlanc++;
             }
     }
@@ -383,11 +392,11 @@ public class Game {
 
 	// récupère la couleur du joueur en cours et celle de l'autre joueur
 	if (joueurEnCours() == 1) {
-            couleur = noir;
-            autreCouleur = blanc;
+            couleur = BLACK;
+            autreCouleur = WHITE;
 	}else if(joueurEnCours() == 2) {
-            couleur = blanc;
-            autreCouleur = noir; 
+            couleur = WHITE;
+            autreCouleur = BLACK; 
 	}
 
 	// si le coup est correct
@@ -409,8 +418,8 @@ public class Game {
     public void randomFirstPlayer() {
         boolean random = (Math.random()*100) >= 50;
         if(random)
-            joueurEnCours = blanc;
+            joueurEnCours = WHITE;
         else
-            joueurEnCours = noir;
+            joueurEnCours = BLACK;
     }
 }

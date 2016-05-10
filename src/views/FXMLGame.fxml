@@ -12,7 +12,7 @@
    <children>
       <Pane fx:id="gamePane" layoutX="1.0" prefHeight="700.0" prefWidth="850.0">
          <children>
-            <GridPane fx:id="gridPane" gridLinesVisible="true" layoutX="71.0" layoutY="192.0" prefHeight="352.0" prefWidth="352.0">
+            <GridPane fx:id="gridPane" layoutX="127.0" layoutY="212.0" prefHeight="352.0" prefWidth="352.0">
               <columnConstraints>
                 <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
                   <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
@@ -34,7 +34,7 @@
                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
               </rowConstraints>
             </GridPane>
-            <Label fx:id="leaderLaber" layoutX="287.0" layoutY="152.0" prefHeight="17.0" prefWidth="36.0" text="Leader" />
+            <Label fx:id="leaderLaber" layoutX="287.0" layoutY="150.0" prefHeight="17.0" prefWidth="36.0" text="Leader" />
             <MenuBar fx:id="menuBar" layoutY="-1.0">
               <menus>
                 <Menu fx:id="optionMenu" mnemonicParsing="false" text="Option">
@@ -63,13 +63,11 @@
             </Circle>
             <ProgressBar fx:id="blackPawnProgressBar" layoutX="107.0" layoutY="151.0" prefHeight="18.0" prefWidth="152.0" progress="0.0" />
             <Circle fx:id="whitePawnsCircle" fill="#fffff2" layoutX="436.0" layoutY="102.0" radius="32.0" stroke="BLACK" strokeType="INSIDE" />
-            <ProgressBar fx:id="whitePawnProgressBar" layoutX="349.0" layoutY="152.0" prefHeight="18.0" prefWidth="152.0" progress="0.0" />
-            <TableView fx:id="scoreTableView" layoutX="581.0" layoutY="266.0" prefHeight="200.0" prefWidth="152.0">
-              <columns>
-                <TableColumn fx:id="scoreJoueur1Column" prefWidth="75.0" text="Pseudo J1" />
-                <TableColumn fx:id="scoreJoueur2Column" prefWidth="75.0" text="Pseudo J2" />
-              </columns>
-            </TableView>
+            <ProgressBar fx:id="whitePawnProgressBar" layoutX="349.0" layoutY="151.0" prefHeight="18.0" prefWidth="152.0" progress="0.0" />
+            <Label layoutX="581.0" layoutY="94.0" text="Joueur en cours :" />
+            <Label fx:id="labelCurrentPlayer" layoutX="612.0" layoutY="126.0" textAlignment="CENTER" />
+            <Label fx:id="labelBlackScore" layoutX="52.0" layoutY="152.0" />
+            <Label fx:id="labelWhiteScore" layoutX="529.0" layoutY="152.0" />
          </children>
       </Pane>
    </children>
