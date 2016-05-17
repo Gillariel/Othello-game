@@ -25,6 +25,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.shape.Circle;
 import models.Game;
+import models.Game1;
 import models.GameController;
 import utils.AppInfo;
 import utils.MyDialog;
@@ -35,17 +36,20 @@ import utils.MyDialog;
  * @author User
  */
 public class FXMLGameController implements Initializable {
-
+    
+    private Game1 currentGame;
+    
     private Game game;
     private GameController controller;
-    private final ImageView[] imagesFromGrid = new ImageView[64];;
+    private final ImageView[] imagesFromGrid = new ImageView[64];
     
     private SimpleDoubleProperty blackScore = new SimpleDoubleProperty(0);
     private SimpleDoubleProperty whiteScore = new SimpleDoubleProperty(0);
     
-    private final Image iconEmpty = new Image("/ressources/Reversi_Empty.png");
+    private final Image iconEmpty = new Image("/ressources/Reversi_Empty.jpg");
     private final Image iconBlack = new Image("/ressources/Reversi_Black.png");
     private final Image iconWhite = new Image("/ressources/Reversi_White.png");
+    private final Image iconPossibility = new Image("/ressources/Reversi_BlackOption.png");
     
     @FXML
     private Pane gamePane;
@@ -89,8 +93,10 @@ public class FXMLGameController implements Initializable {
     // Rgb color for Background pics : (10,230,65)
     @Override
     public void initialize(URL url, ResourceBundle rb) {
+        if(game != null){ ;
+        }else{
         game = new Game();
-        controller = new  GameController();
+        controller = new GameController();
         game.prepareInstance();
         game.initialiseJeu();
         
@@ -101,17 +107,18 @@ public class FXMLGameController implements Initializable {
         labelBlackScore.textProperty().bind(blackScore.asString());
         labelWhiteScore.textProperty().bind(whiteScore.asString());
         
-        
+        int indice = 0;
         for(int i = 0; i < 8; i++) {
             for(int j = 0; j < 8; j++) {
+                indice = (i * 8) + j;
                 if(i == 3 && j == 3 || i == 4 && j == 4){
                     ImageView img = new ImageView(iconWhite);
-                    imagesFromGrid[i*j] = img;
+                    imagesFromGrid[indice] = img;
                     gridPane.add(new HBox(img), j, i);
                 }
                 else if(i == 3 && j == 4 || i == 4 && j == 3){
                     ImageView img = new ImageView(iconBlack);
-                    imagesFromGrid[i*j] = img;
+                    imagesFromGrid[indice] = img;
                     gridPane.add(new HBox(img), j, i);
                 }
                 else {
@@ -119,21 +126,25 @@ public class FXMLGameController implements Initializable {
                     if(i == 0) imagesFromGrid[j] = img;
                     if(j == 0) imagesFromGrid[i] = img;
                     if(i == 0 && j == 0) imagesFromGrid[0] = img; 
+                    imagesFromGrid[indice] = img;
                     gridPane.add(new HBox(img), j, i);
                 }
             }
         }
         
-        /*showPossiblesHits();
         showCurrentPlayer();
-        showScore();*/
+        showScore();
+        
+        initializeBoard();
         
         for(Node n : gridPane.getChildren())
             n.addEventFilter(MouseEvent.MOUSE_PRESSED, (MouseEvent event) -> {
-                game.setCaseJouer(GridPane.getRowIndex(n) + GridPane.getColumnIndex(n));
+                game.setCaseJouer((GridPane.getRowIndex(n))*8 +  (GridPane.getColumnIndex(n)));
+                game.setRowPlayed((GridPane.getRowIndex(n)+1));
+                game.setColumnPlayed((GridPane.getColumnIndex(n)+1));
                 PlayHit();
         });
-        initializeBoard();
+        }
     }
 
     /**In-Game Methods */
@@ -148,18 +159,18 @@ public class FXMLGameController implements Initializable {
         
 	// récupère et affiche les coups possibles
 	game.coupsPossibles();
-	for (int j = 1; j <  9; j++)
-            for (int k = 1; k < 9; k++)
-                if (game.getCoupPossibles()[j][k] == true)
-			imagesFromGrid[game.getNumeroCase(j,k)].setImage(iconWhite);
+	for (int j = 0; j < 8; j++)
+            for (int k = 0; k < 8; k++)
+                if(game.getCoupPossibles()[j][k])
+		    imagesFromGrid[game.getNumeroCase(j,k)].setImage(iconPossibility);
     }
     
     public void showPossiblesHits() {
         game.coupsPossibles();
-        for(int i = 1; i < 9; i++) 
-            for(int j = 1; j < 9 ; j++)        
+        for(int i = 0; i < 8; i++) 
+            for(int j = 0; j < 8; j++)        
                 if(game.getCoupPossibles()[i][j])
-                    imagesFromGrid[i+j].setImage(iconWhite);
+                    imagesFromGrid[game.getNumeroCase(i, j)].setImage(iconPossibility);
     }
     
     public void showCurrentPlayer() {
@@ -172,33 +183,17 @@ public class FXMLGameController implements Initializable {
         whiteScore.set(game.getScore(2));
     }
     
-    public void update() {
-        if(!game.partieEstFinie()){
-            for(int i = 0; i < 8; i++) {
-                for(int j = 0; j < 8; j++) {
-                    switch(game.getCouleurCase(i, j)){
-                        case 0 : 
-                            imagesFromGrid[i*j].setImage(iconEmpty);
-                            break;
-                        case 1 :
-                            imagesFromGrid[i*j].setImage(iconBlack);
-                            break;
-                        case 2 :
-                            imagesFromGrid[i*j].setImage(iconWhite);
-                            break;
-                    }
-                }    
-            }
-            showCurrentPlayer();
-            showPossiblesHits();
-            showScore();
-        }
+    public void updateFromFile() {
+        switchPawnsColor();
+        showCurrentPlayer();
+        showPossiblesHits();
+        showScore();
     }
     
     public void PlayHit() {			
-	if (game.joueurEnCours() == 1)
+	/*if (game.joueurEnCours() == 1)
             game.setCaseJouer(game.choixCase());
-			
+	*/		
 	int row = game.getLigne(game.getCaseJouer());		// lit la ligne de la case choisie
 	int column = game.getColonne(game.getCaseJouer());	// lit la colonne  de la case choisie
 	int color;							// couleur du joueur en cours
@@ -213,7 +208,9 @@ public class FXMLGameController implements Initializable {
             otherColor = game.BLACK;
             //txt = "BLANC";
         }
-		
+	
+        labelCurrentPlayer.setText("Row : " + game.getRowPlayed() + " / Column : " + game.getColumnPlayed());
+        
 	// si le coup est correct
 	if (game.placementCorrect(row, column, color, otherColor, true) == true) {		
             // change les couleurs en interface graphique
@@ -265,8 +262,6 @@ public class FXMLGameController implements Initializable {
 	else {
             if ((game.getWhiteCounter() + game.getBlackCounter()) < game.NB_BOX) MyDialog.warningDialog("Not Allowed", "Please choose a valid position and try again!");
             else MyDialog.confirmationDialog("End Game", "It's Over!", "Do you want to play the following game?");
-
-            //coordCoupJoue.setText("L: ?  ||  C: ? ");
 	}
     }
     
@@ -274,6 +269,7 @@ public class FXMLGameController implements Initializable {
 	int uneCase = 0;
 	for (int i = 1; i < 9; i++)	
             for (int j = 1; j < 9; j++) {
+                
                 // remet les cases en couleur normale
 		if (game.getCouleurCase(i,j) == game.WHITE) 
                     imagesFromGrid[uneCase].setImage(iconWhite);
@@ -281,7 +277,7 @@ public class FXMLGameController implements Initializable {
                     imagesFromGrid[uneCase].setImage(iconBlack);
 		else if (game.getCouleurCase(i, j) == game.TAKE_BY_BLACK) {
                     imagesFromGrid[uneCase].setImage(iconBlack);
-                    game.setSpecificBox(i, j, game.BLACK);
+                    game.setSpecificBox(i,j, game.BLACK);
 		}else if (game.getCouleurCase(i,j) == game.TAKE_BY_WHITE) {
                     imagesFromGrid[uneCase].setImage(iconWhite);
                     game.setSpecificBox(i, j, game.WHITE);
@@ -320,8 +316,11 @@ public class FXMLGameController implements Initializable {
     
     /** Getters & Setters */
     public Game getGame() {return game; }
+    public void setCurrentGame(Game1 g) { this.currentGame = g; }
     /**End Getters & Setters */
     
+    public void save () { this.game.sauvegardeJeux("game"); }
+    public void load() { game = game.chargerUnePartie("game");}
     
     @FXML
     private void handleSaveGame(ActionEvent event) {

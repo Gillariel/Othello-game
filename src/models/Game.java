@@ -10,12 +10,13 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.Serializable;
 
 /**
  *
  * @author User
  */
-public class Game {
+public class Game implements Serializable {
     // statut des cases
     public final int BLACK = 1;
     public final int WHITE = 2;
@@ -36,11 +37,13 @@ public class Game {
 	
     // mémorise le numéro des cases graphiques par rapport aux coordonnées
     private int[][] boxesNumber = new int[10][10];
-	
+    
     // mémorise  les coordonnées des cases graphiques par rapport à leurs  numéro 
     private int[] rowBoxes = new int[64];
     private int[] columnBoxes = new int[64];
-	
+    
+    private int rowPlayed;
+    private int columnPlayed;
     private int choosenBox;  		// récupère grâce au clic du joueur sur une case
     private int playedBox;
 	
@@ -60,10 +63,6 @@ public class Game {
     	
     // statut du plateau en cours
     private int gameStatus[][] = new int[10][10];
-	
-    /** CONSTANTE  EVALUATION  MIN-MAX   */
-    final int MINEVAL= -100000;
-    final int MAXEVAL= 100000;
 	
 	
     public Game() { initialiseJeu(); }
@@ -142,7 +141,7 @@ public class Game {
     public int getLigne(int uneCase) { return rowBoxes[uneCase]; }
     public int getColonne(int uneCase) { return columnBoxes[uneCase]; }
     public int getLignePris(int unIndice) { return rowTaken[unIndice]; }
-    public  int getColonnePris(int unIndice) { return columnTaken[unIndice]; }
+    public int getColonnePris(int unIndice) { return columnTaken[unIndice]; }
     public int getNumeroCase(int ligne, int colonne) { return boxesNumber[ligne][colonne]; }
     public int getScore(int unJoueur) {
         if (unJoueur == 1) return blackCounter;
@@ -152,6 +151,10 @@ public class Game {
     public int getCouleurCase(int ligne, int colonne) { return board[ligne][colonne]; }
     public int choixCase() { return choosenBox; }
     public int getCaseJouer() { return playedBox; }
+    public int getRowPlayed() { return rowPlayed; }
+    public int getColumnPlayed() { return columnPlayed; }
+    public void setRowPlayed(int x) { this.rowPlayed = x; }
+    public void setColumnPlayed(int y) { this.columnPlayed = y; }
     public void setCaseJouer(int newOne) { this.playedBox = newOne; }
     public int getBlackCounter() { return blackCounter; }
     public int getWhiteCounter() { return whiteCounter; }
@@ -201,7 +204,7 @@ public class Game {
                                     // modifie la couleur des pions pris
                                     if (couleur == BLACK)
                                         board[ligne + a*m][colonne + b*m] = TAKE_BY_BLACK;
-                                    else if ( couleur == WHITE ) 
+                                    else if (couleur == WHITE ) 
                                         board[ligne + a*m][colonne + b*m] = TAKE_BY_WHITE;
                                 }
                                 // la case choisie prend la couleur du joueur en cours
@@ -318,7 +321,7 @@ public class Game {
     public void sauvegardeJeux(String nomSauvegarde) {
 	int compteur = 0;
 	try  {
-            FileOutputStream fluxSortieFichier = new FileOutputStream("save/" + nomSauvegarde + ".sav");
+            FileOutputStream fluxSortieFichier = new FileOutputStream(nomSauvegarde + ".sav");
             ObjectOutputStream fluxSortieObjet= new ObjectOutputStream(fluxSortieFichier);
             try{
 		fluxSortieObjet.writeObject(this);
@@ -335,16 +338,14 @@ public class Game {
 	}
     }
 	
-    public void chargerUnePartie(String nomFichier) {
+    public Game chargerUnePartie(String nomFichier) {
         int compteur = 0;
 	try {
-            // ouverture d'un flux d'entrée depuis le fichier "personne.serial"
-            FileInputStream fluxEntreeFichier = new FileInputStream("sauvegarde/"+nomFichier+".sav");
-            // création d'un "flux objet" avec le flux fichier
+            FileInputStream fluxEntreeFichier = new FileInputStream(nomFichier+".sav");
             ObjectInputStream fluxEntreeObjet= new ObjectInputStream(fluxEntreeFichier);
             try {		
 		// désérialisation : lecture de l'objet depuis le flux d'entrée
-                currentGame = (Game)fluxEntreeObjet.readObject();
+                 return (Game)fluxEntreeObjet.readObject();
             } finally {
                 // on ferme les flux
 		try {
@@ -358,6 +359,7 @@ public class Game {
 	} catch(ClassNotFoundException cnfe) {
             cnfe.printStackTrace();
 	}
+        return null;
     }	
 			
     

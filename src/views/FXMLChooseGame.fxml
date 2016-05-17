@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+
+<AnchorPane id="AnchorPane" prefHeight="225.0" prefWidth="448.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8" fx:controller="views.FXMLChooseGameController">
+   <children>
+      <ComboBox fx:id="comboBoxGames" layoutX="247.0" layoutY="52.0" prefWidth="150.0" />
+      <Label layoutX="32.0" layoutY="55.0" text="Choose the game you want to play :" />
+      <Button fx:id="btn_play" layoutX="174.0" layoutY="139.0" mnemonicParsing="false" onAction="#handle_btn_play" prefHeight="25.0" prefWidth="97.0" text="Play!" />
+   </children>
+</AnchorPane>
