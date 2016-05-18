@@ -59,8 +59,7 @@ public class FXMLChooseGameController implements Initializable {
                 stage.setScene(scene);
                 stage.getIcons().add(new Image("http://swap.sec.net/annex/icon.png"));
                 stage.centerOnScreen();
-                stage.setResizable(false);
-                stage.setFullScreen(true);
+                stage.setResizable(true);
                 stage.setTitle("Othello - Game");
                 stage.show();
             }catch(IOException e) {

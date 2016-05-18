@@ -38,7 +38,7 @@ public class Game implements Serializable {
     // mémorise le numéro des cases graphiques par rapport aux coordonnées
     private int[][] boxesNumber = new int[10][10];
     
-    // mémorise  les coordonnées des cases graphiques par rapport à leurs  numéro 
+    // mémorise les coordonnées des cases graphiques par rapport à leurs  numéro 
     private int[] rowBoxes = new int[64];
     private int[] columnBoxes = new int[64];
     
@@ -65,13 +65,12 @@ public class Game implements Serializable {
     private int gameStatus[][] = new int[10][10];
 	
 	
-    public Game() { initialiseJeu(); }
+    public Game() { initializeGame(); }
 	
     /** PREPARE  LES  INSTANCES  DU  JEU */
     public void prepareInstance() {
         
-        // met à false le tableau coupsPossibles
-	remiseAZeroCoupPossibles();
+	resetPossibleHits();
 		
         // met à 0 la liste des modèles, le joueur en cours et met à 0 le compteur de modèle
 	currentPlayer = choosenCurrentPlayer;
@@ -85,320 +84,227 @@ public class Game implements Serializable {
             }
 		
 	// enregistre les lignes et colonnes par rapport aux coordonnées des cases.
-	int ligne = 1;
+	int row = 1;
 	for (int i = 0; i < 64; i++){
-            if (i > 7 ) ligne = 2;
-            if (i > 15) ligne = 3;
-            if (i > 23) ligne = 4;
-            if (i > 31) ligne = 5;
-            if (i > 39) ligne = 6;
-            if (i > 47) ligne = 7;
-            if (i > 55) ligne = 8;
-            rowBoxes[i]= ligne;		// un décalage de 1 par rapport à l'interface graphique
+            if (i > 7 ) row = 2;
+            if (i > 15) row = 3;
+            if (i > 23) row = 4;
+            if (i > 31) row = 5;
+            if (i > 39) row = 6;
+            if (i > 47) row = 7;
+            if (i > 55) row = 8;
+            rowBoxes[i]= row;
         }
-		
-	int colonne = 1;
-	for (int i = 0; i < 64; i++) {
-            if (colonne > 8) colonne = 1;
-            columnBoxes[i] = colonne;
-            colonne++;
+
+        int column = 1;
+        for (int i = 0; i < 64; i++) {
+            if (column > 8) column = 1;
+            columnBoxes[i] = column;
+            column++;
 	}
-			
-	// initialise à zéro le tableau des cases pris.
+	
         for (int i = 0; i < 32; i++){
             rowTaken[i] = 0;
-            columnTaken[i] = -0;
+            columnTaken[i] = 0;
 	}	
     }	
 		
     /** INITIALISE  UNE  PARTIE **/	
-    public void initialiseJeu() {
-    // déclare les cases qui se trouve hors du plateau de jeu
-	for (int i = 0; i < 10; i++) {	
+    public void initializeGame() {
+        for (int i = 0; i < 10; i++) {	
             board[i][0] = OUT_OF_BOUNDS;
             board[i][9] = OUT_OF_BOUNDS;
             board[0][i] = OUT_OF_BOUNDS;
             board[9][i] = OUT_OF_BOUNDS;
-	}		
-		
-	// déclare toutes les cases en statut libre
+        }		
+        
 	for (int i = 1; i < 9; i++)
             for (int j = 1; j < 9; j++)
 		board[i][j] = EMPTY;
 		
-	// positionne les 4 pions de départ sur les case 27, 28, 35 et 36
-	board[4][4] = WHITE;
-	board[4][5] = BLACK;
-	board[5][4] = BLACK;
-	board[5][5] = WHITE;
-				
-	// initialise les compteurs de pions.
-	whiteCounter = 2;
-	blackCounter = 2;
+        board[4][4] = WHITE;
+        board[4][5] = BLACK;
+        board[5][4] = BLACK;
+        board[5][5] = WHITE;
+
+        whiteCounter = 2;
+        blackCounter = 2;
     }
     
-    public int joueurEnCours() { return currentPlayer; }
-    public int getLigne(int uneCase) { return rowBoxes[uneCase]; }
-    public int getColonne(int uneCase) { return columnBoxes[uneCase]; }
-    public int getLignePris(int unIndice) { return rowTaken[unIndice]; }
-    public int getColonnePris(int unIndice) { return columnTaken[unIndice]; }
-    public int getNumeroCase(int ligne, int colonne) { return boxesNumber[ligne][colonne]; }
-    public int getScore(int unJoueur) {
-        if (unJoueur == 1) return blackCounter;
-        else return whiteCounter; 
-    }
-    public boolean[][] getCoupPossibles() { return possibleHits; }
-    public int getCouleurCase(int ligne, int colonne) { return board[ligne][colonne]; }
-    public int choixCase() { return choosenBox; }
-    public int getCaseJouer() { return playedBox; }
+    public int getRow(int boxNumber) { return rowBoxes[boxNumber]; }
+    public int getColumn(int boxNumber) { return columnBoxes[boxNumber]; }
+    public int getRowTaken(int index) { return rowTaken[index]; }
+    public int getColumnTaken(int index) { return columnTaken[index]; }
+    public int getBoxNumber(int row, int column) { return boxesNumber[row][column]; }
+    public boolean[][] getPossibleHits() { return possibleHits; }
+    public int getBoxColor(int row, int column) { return board[row][column]; }
+    public int getPlayedBox() { return playedBox; }
     public int getRowPlayed() { return rowPlayed; }
     public int getColumnPlayed() { return columnPlayed; }
+    public int getCurrentPlayer() { return currentPlayer; }
+    public int getScore(int playerNumber) { return (playerNumber == 1)? blackCounter : whiteCounter;  }
     public void setRowPlayed(int x) { this.rowPlayed = x; }
     public void setColumnPlayed(int y) { this.columnPlayed = y; }
-    public void setCaseJouer(int newOne) { this.playedBox = newOne; }
-    public int getBlackCounter() { return blackCounter; }
-    public int getWhiteCounter() { return whiteCounter; }
+    public void setPlayedBox(int newOne) { this.playedBox = newOne; }
     public void setCurrentPlayer(int player) { this.currentPlayer = player; }
     public void setSpecificBox(int row, int column, int value) { this.board[row][column] = value; }
-    public int getCurrentPlayer() { return currentPlayer; }
+
     
     // véfirie si le placement est correcte
-    public boolean placementCorrect(int ligne, int colonne, int couleur, int autreCouleur, boolean joueLeCoup) {	
+    public boolean isCorrectPosition(int row, int column, int color, int otherColor, boolean hitNeedToBePlay) {	
 	int i, j;
-	int nbEtape;
-	boolean correct = false;
-	// si la case est libre
-	if (board[ligne][colonne] == EMPTY) {
-            int indice = 0;
-            for (int a = -1; a < 2; a++)		// permet de savoir dans qu'elle direction on va
-		for (int b = -1; b < 2; b++) {	// par rapport à la case choisie
-                    nbEtape = 0;				// indique le nombre de pions adverses trouvés
+        //step represent the number of pawn taken in the same range
+	int step;
+	boolean result = false;
+	if (board[row][column] == EMPTY) {
+            int index = 0;
+            for (int k = -1; k < 2; k++){	
+		for (int l = -1; l < 2; l++) {
+                    step = 0;
                     do {		
-			nbEtape++;
-			i = ligne + nbEtape*a;
-			j = colonne + nbEtape*b;
-                    } 
-                    
-                    // permet de voir s'il y a un autre pion
-                    // d'une autre couleur
-                    while ( (i > 0 ) && (i < 9) && (j > 0) && (j < 9) && (board[i][j] == autreCouleur));  
-			// si au moins un pion d'une autre couleur est trouvé 
-			// et qu'on se trouve dans le plateau 
-			// et qu'un pion de même couleur est trouvé 
-			if (( i > 0 ) && (i < 9)  && (j > 0) && (j < 9) && (nbEtape > 1) && (board[i][j] == couleur)) {
-                            correct = true;
-                            // mémorise les coordonnées des pions pris
-                            for (int k = 1; k < nbEtape; k++) {
-				testRowTaken[indice]= ligne + a*k;
-				testColumnTaken[indice] = colonne + b*k;
-				indice++;
-                            }			
+			step++;
+			i = row + (step * k);
+			j = column + (step * l);
+                    }while ((i > 0 ) && (i < 9) && (j > 0) && (j < 9) && (board[i][j] == otherColor));  
+                        //test if we're in the board and if there is a pawn of the same color
+                    if (( i > 0 ) && (i < 9)  && (j > 0) && (j < 9) && (step > 1) && (board[i][j] == color)) {
+                        result = true;
+                        for (int m = 1; m < step; m++) {
+                            testRowTaken[index]= row + m*m;
+                            testColumnTaken[index] = column + l*m;
+                            index++;
+                        }			
                             
-                            // si le coup est vraiment joué, on exécute cette boucle
-                            if (joueLeCoup) {	
-				for (int m = 1; m < nbEtape; m++) {
-                                    // enregistre les cases prises
-                                    rowTaken[indice]= ligne + a*m;
-                                    columnTaken[indice] = colonne + b*m;
-                                    indice++;
-                                    // modifie la couleur des pions pris
-                                    if (couleur == BLACK)
-                                        board[ligne + a*m][colonne + b*m] = TAKE_BY_BLACK;
-                                    else if (couleur == WHITE ) 
-                                        board[ligne + a*m][colonne + b*m] = TAKE_BY_WHITE;
-                                }
-                                // la case choisie prend la couleur du joueur en cours
-                                board[ligne][colonne] = couleur;		
+                        //execute the hit if it's said
+                        if (hitNeedToBePlay) {
+                            for (int n = 1; n < step; n++) {
+                                // enregistre les cases prises
+                                rowTaken[index] = row + (k * n);
+                                columnTaken[index] = column + (l * n);
+                                index++;
+                                //change the color of the taken's pawns
+                                board[row + (k * n)][column + (l * n)] = (color == BLACK) ? TAKE_BY_BLACK : TAKE_BY_WHITE;
+                                /*    board[row + k*n][column + l*n] = ;
+                                else if (color == WHITE ) 
+                                    board[row + k*n][column + l*n] = ;
+                                }*/
+                                board[row][column] = color;		
                             }
 			}
+                    }
 		}
+            }
 	}
-	return correct;
+	return result;
     }	
 	
-    // change le joueur en cours
-    public void changeTourJoueur() {
-	if (currentPlayer == 1) currentPlayer = 2;
-	else currentPlayer = 1;
-    }
+    public void switchPlayer() { currentPlayer = (currentPlayer == 1)? 2 : 1; }
 	
-    // remet à 0 le tableau des cases prises
-    public void reinitialiseCasesPrises() {
+    public void resetTakenBoxes() {
 	for (int i = 0; i < 32; i++) {
             rowTaken[i] = 0;
             columnTaken[i] = 0;
 	}	
     }
 	
-    // vérifie si la partie est terminée
-    public boolean partieEstFinie() {
+    public boolean isFinished() {
         boolean partieFinie = true;	
-	for (int y = 1; y < 9; y++ )
-            for (int z = 1; z < 9; z++ )
-		if ((placementCorrect(y, z, WHITE, BLACK, false)) || (placementCorrect(y, z, BLACK, WHITE, false)))
+	for (int i = 1; i < 9; i++ )
+            for (int j = 1; j < 9; j++ )
+		if ((isCorrectPosition(i, j, WHITE, BLACK, false)) || (isCorrectPosition(i, j, BLACK, WHITE, false)))
                     partieFinie = false;
 	return partieFinie;
     }
 	
-    // vérifie si le joueur blanc ne peut plus jouer
-    public boolean jbPeutPlusJouer() {
-	boolean jbPeutPlusJouer = true;
-	for (int y = 1; y < 9; y++ )
-            for (int z = 1; z < 9; z++ )		
-		if (placementCorrect(y, z, WHITE, BLACK, false))
-                    jbPeutPlusJouer = false;			
-	return jbPeutPlusJouer;
+    public boolean IsWhiteUnableToPlay() {
+	boolean result = true;
+	for (int i = 1; i < 9; i++ )
+            for (int j = 1; j < 9; j++ )		
+		if (isCorrectPosition(i, j, WHITE, BLACK, false))
+                    result = false;			
+	return result;
     }
 	
-    // vérifie si le joueur noir ne peut plus jouer
-    public boolean jnPeutPlusJouer() {
-	boolean jnPeutPlusJouer = true;
-        for (int y = 1; y < 9; y++ )
-            for (int z = 1; z < 9; z++ )		
-                if (placementCorrect(y, z, BLACK, WHITE, false))
-                    jnPeutPlusJouer = false;			
-	return jnPeutPlusJouer;
+    public boolean IsBlackUnableToPlay() {
+	boolean result = true;
+        for (int i = 1; i < 9; i++ )
+            for (int j = 1; j < 9; j++ )		
+                if (isCorrectPosition(i, j, BLACK, WHITE, false))
+                    result = false;			
+	return result;
     }
 	
-    // permet de montrer les coups possibles à jouer
-    public void coupsPossibles() {
-	// pour le joueur noir
-	if (joueurEnCours() == 1) {
+    public void calcPossibleHits() {
+        if (getCurrentPlayer()== 1) {
             for (int i = 1 ; i < 9; i++)
-		for (int j = 1; j < 9 ; j++)
-                    if (placementCorrect(i, j, BLACK, WHITE, false))
-			possibleHits[i][j] = true;
+                for (int j = 1; j < 9 ; j++)
+                    if (isCorrectPosition(i, j, BLACK, WHITE, false))
+                        possibleHits[i][j] = true;
         }
-		
-	// pour le joueur blanc
-	else if (joueurEnCours() == 2) {
-            for (int m = 1 ; m < 9; m++)
-                for (int n = 1; n < 9 ; n++)
-                    if (placementCorrect(m, n, WHITE, BLACK, false))
-			possibleHits[m][n] = true;
-	}
+        else if (getCurrentPlayer() == 2) {
+            for (int i = 1 ; i < 9; i++)
+                for (int j = 1; j < 9 ; j++)
+                    if (isCorrectPosition(i, j, WHITE, BLACK, false))
+                        possibleHits[i][j] = true;
+        }
+    }
+    
+    public void resetPossibleHits() {
+        for (int i = 1 ; i < 9; i++)
+            for (int j = 1; j < 9 ; j++)
+                possibleHits[i][j] = false;
     }
 	
-    // remise à 0 tableau coupPossibles
-    public void remiseAZeroCoupPossibles() {
-	for (int i = 1 ; i < 9; i++)
-            for (int j = 1; j < 9 ; j++)
-		possibleHits[i][j] = false;
-    }	
-	
-    // calcul du nombre de pions de chaque joueur
-    public void calculScore() {
-	whiteCounter = 0;
-	blackCounter = 0;	
-	for (int d = 1; d < 9; d++)
-            for (int f = 1; f < 9; f++) {
-		if (board[d][f] == BLACK || board[d][f] == TAKE_BY_BLACK)
+    public void calcScore() {
+        whiteCounter = 0;
+        blackCounter = 0;	
+        for (int i = 1; i < 9; i++) {
+            for (int j = 1; j < 9; j++) {
+		if (board[i][j] == BLACK || board[i][j] == TAKE_BY_BLACK)
                     blackCounter++;
-		if (board[d][f] == WHITE || board[d][f] == TAKE_BY_WHITE)
+                if (board[i][j] == WHITE || board[i][j] == TAKE_BY_WHITE)
                     whiteCounter++;
             }
+        }
     }
     
-    // créer une copie du jeu 
-    public Game copier() {
-        // crée un nouveau modèle
-	Game mod = new Game();
-		
-	// récupère le statut des  cases
-	for (int i = 1; i < 9; i++)
-            for (int j = 1; j < 9; j++)
-		mod.gameStatus[i][j] = board[i][j];				
-	// récupère le joueurs en cours
-	mod.currentPlayer = joueurEnCours();
-	// récupère les points
-	mod.whiteCounter = whiteCounter;
-	mod.blackCounter = blackCounter;
-	// récupère la case joué
-	mod.playedBox = playedBox;	
-	return mod;
-    }
-		
-    public void sauvegardeJeux(String nomSauvegarde) {
-	int compteur = 0;
-	try  {
-            FileOutputStream fluxSortieFichier = new FileOutputStream(nomSauvegarde + ".sav");
-            ObjectOutputStream fluxSortieObjet= new ObjectOutputStream(fluxSortieFichier);
-            try{
-		fluxSortieObjet.writeObject(this);
-		fluxSortieObjet.flush();		
-            } finally {
-                try {
-                    fluxSortieObjet.close();
-		} finally {
-                    fluxSortieFichier.close();
-                }
-            }
-	} catch(IOException ioe) {
-            ioe.printStackTrace();
-	}
+    public void save(String name) {
+        try (ObjectOutputStream stream = new ObjectOutputStream(new FileOutputStream(name + ".sav"))) {
+            stream.writeObject(this);
+            stream.flush();
+        }catch(IOException e) { e.printStackTrace(); }
     }
 	
-    public Game chargerUnePartie(String nomFichier) {
-        int compteur = 0;
-	try {
-            FileInputStream fluxEntreeFichier = new FileInputStream(nomFichier+".sav");
-            ObjectInputStream fluxEntreeObjet= new ObjectInputStream(fluxEntreeFichier);
-            try {		
-		// désérialisation : lecture de l'objet depuis le flux d'entrée
-                 return (Game)fluxEntreeObjet.readObject();
-            } finally {
-                // on ferme les flux
-		try {
-                    fluxEntreeObjet.close();
-		} finally {
-                    fluxEntreeFichier.close();
-		}
-            }
-	} catch(IOException ioe) {
-            ioe.printStackTrace();
-	} catch(ClassNotFoundException cnfe) {
-            cnfe.printStackTrace();
-	}
+    public Game load(String name) {
+	try (ObjectInputStream stream = new ObjectInputStream(new FileInputStream(name + ".sav"))) {
+            return (Game)stream.readObject();
+	}catch(IOException e) { e.printStackTrace(); }
+        catch(ClassNotFoundException e2) { e2.printStackTrace(); }
         return null;
     }	
-			
-    
-    public void jouerUnCoup(int unCase) {			
-	int row = getLigne(unCase);		// lit la ligne de la case choisie
-	int column = getColonne(unCase);	// lit la colonne  de la case choisie
-	int color = 0;							// couleur du joueur en cours
-	int otherColor = 0;	
 
-	// récupère la couleur du joueur en cours et celle de l'autre joueur
-	if (joueurEnCours() == 1) {
+    public void play(int box) {			
+        int row = getRow(box);
+        int column = getColumn(box);
+        int color = 0, otherColor = 0;	
+        
+        if (getCurrentPlayer() == 1) {
             color = BLACK;
             otherColor = WHITE;
-	}else if(joueurEnCours() == 2) {
+        }else if(getCurrentPlayer() == 2) {
             color = WHITE;
             otherColor = BLACK; 
-	}
-
-	// si le coup est correct
-	if (placementCorrect(row, column, color, otherColor, true)) {		
-            // fin du tour du joueur : changement de joueur
-            changeTourJoueur();
-            // remet à zéro le tableau des cases pris.
-            reinitialiseCasesPrises();
-            // calcul du score 
-            calculScore();
-            // si un des 2 joueurs ne peut jouer on passe le tour 
+        }
+        
+        if (isCorrectPosition(row, column, color, otherColor, true)) {		
+            switchPlayer();
+            resetTakenBoxes(); 
+            calcScore();
+             
             if ((whiteCounter + blackCounter) < 64) {
-		if (jbPeutPlusJouer() == true) currentPlayer = 1;
-		if (jnPeutPlusJouer() == true) currentPlayer = 2;
+		if (IsWhiteUnableToPlay() == true) currentPlayer = 1;
+		if (IsBlackUnableToPlay() == true) currentPlayer = 2;
             } 
-	}
-    }
-    
-    public void randomFirstPlayer() {
-        boolean random = (Math.random()*100) >= 50;
-        if(random)
-            currentPlayer = WHITE;
-        else
-            currentPlayer = BLACK;
+        }
     }
 }
