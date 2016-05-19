@@ -22,6 +22,7 @@ import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import javafx.util.Pair;
 import models.Game1;
+import utils.Log;
 import utils.MyDialog;
 
 /**
@@ -32,6 +33,8 @@ import utils.MyDialog;
 public class FXMLChooseGameController implements Initializable {
 
     private Game1 game;
+    
+    private Stage stage;
     
     @FXML
     private ComboBox<Pair<String,String>> comboBoxGames;
@@ -48,7 +51,7 @@ public class FXMLChooseGameController implements Initializable {
                 if(p != null)
                     comboBoxGames.getItems().add(p);
                 else
-                    generateNextTurn();
+                    provider.generateNextTurn();
     }    
 
     @FXML
@@ -87,15 +90,14 @@ public class FXMLChooseGameController implements Initializable {
                 stage.setResizable(false);
                 stage.setFullScreen(true);
                 stage.setTitle("Othello - Game");
+                controller.setStage(stage);
                 stage.show();
-                
+                this.stage.close();
             }catch(IOException e) {
                 MyDialog.warningDialog("Warning", "Error while loading the game window, please try again.");
             }
         }
     }
 
-    private void generateNextTurn() {
-        
-    }
+    public void setStage(Stage s) { this.stage = s; }
 }

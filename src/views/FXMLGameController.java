@@ -29,7 +29,6 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
-import javafx.scene.shape.Circle;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
@@ -47,7 +46,7 @@ import utils.MyDialog;
 public class FXMLGameController implements Initializable {
     
     private Game1 currentGame;
-    
+    private Stage stage;
     private Game game;
     private GameController controller;
     private final ImageView[] imagesFromGrid = new ImageView[64];
@@ -82,11 +81,7 @@ public class FXMLGameController implements Initializable {
     @FXML
     private MenuItem RulesMenuItem;
     @FXML
-    private Circle blackPawnsCircle;
-    @FXML
     private ProgressBar blackPawnProgressBar;
-    @FXML
-    private Circle whitePawnsCircle;
     @FXML
     private ProgressBar whitePawnProgressBar;
     @FXML
@@ -169,10 +164,9 @@ public class FXMLGameController implements Initializable {
 	imagesFromGrid[35].setImage(iconBlack);
 	imagesFromGrid[36].setImage(iconWhite);
         
-	// récupère et affiche les coups possibles
 	game.calcPossibleHits();
-	for (int j = 0; j < 8; j++)
-            for (int k = 0; k < 8; k++)
+	for (int j = 1; j < 9; j++)
+            for (int k = 1; k < 9; k++)
                 if(game.getPossibleHits()[j][k])
                     if(game.getCurrentPlayer() == 1)
                         imagesFromGrid[game.getBoxNumber(j,k)].setImage(iconBlackPossibility);
@@ -182,8 +176,8 @@ public class FXMLGameController implements Initializable {
     
     public void showPossiblesHits() {
         game.calcPossibleHits();
-        for(int i = 0; i < 8; i++) 
-            for(int j = 0; j < 8; j++)        
+        for(int i = 1; i < 9; i++) 
+            for(int j = 1; j < 9; j++)        
                 if(game.getPossibleHits()[i][j])
                     if(game.getCurrentPlayer() == 1)
                         imagesFromGrid[game.getBoxNumber(i, j)].setImage(iconBlackPossibility);
@@ -193,7 +187,6 @@ public class FXMLGameController implements Initializable {
     
     public void showCurrentPlayer() {
         labelCurrentPlayer.setText((game.getCurrentPlayer() == 1)? "Black" : "White");
-	//MyDialog.dialogWithoutHeader("Turn Change", "Player " + labelCurrentPlayer.getText() + ", it's your turn !");
     }
     
     public void showScore() {
@@ -229,8 +222,8 @@ public class FXMLGameController implements Initializable {
             //Adapt GUI with the model
             switchPawnsColor();
             
-            //if (game.joueurEnCours() == game.BLACK) imagesFromGrid[game.getCaseJouer()].setImage(iconBlack);
-            //if (game.joueurEnCours() == game.WHITE) imagesFromGrid[game.getCaseJouer()].setImage(iconWhite);
+            //if (game.getCurrentPlayer() == game.BLACK) imagesFromGrid[game.getPlayedBox()].setImage(iconBlack);
+            //if (game.getCurrentPlayer() == game.WHITE) imagesFromGrid[game.getPlayedBox()].setImage(iconWhite);
 	
             game.switchPlayer();
             game.resetTakenBoxes();
@@ -238,8 +231,8 @@ public class FXMLGameController implements Initializable {
             showScore();
 			
             if ((getTotalPawnsTaken()) < game.NB_BOX) {
-                if (game.IsWhiteUnableToPlay() == true) game.setCurrentPlayer(game.BLACK);
-		if (game.IsBlackUnableToPlay() == true) game.setCurrentPlayer(game.WHITE);
+                if (game.IsWhiteUnableToPlay()) game.setCurrentPlayer(game.BLACK);
+		if (game.IsBlackUnableToPlay()) game.setCurrentPlayer(game.WHITE);
             }
 
             game.resetPossibleHits();
@@ -248,7 +241,6 @@ public class FXMLGameController implements Initializable {
             showPossiblesHits();
             showCurrentPlayer();
 			
-            // termine la partie si l'une des conditions est vraie.
             if ((game.isFinished()== true) || (getTotalPawnsTaken() == game.NB_BOX) || (getWhiteCounter() == 0) || (getBlackCounter() == 0)) 
 		endGame();	
 	}
@@ -257,29 +249,28 @@ public class FXMLGameController implements Initializable {
             if (getTotalPawnsTaken() < game.NB_BOX) MyDialog.warningDialog("Not Allowed", "Please choose a valid position and try again!");
             else {
                 endGame();
-                //MyDialog.confirmationDialog("End Game", "It's Over!", "Do you want to play the following game?");
             }
 	}
     }
     
     public void switchPawnsColor() {
-	int uneCase = 0;
+	int oneBox = 0;
 	for (int i = 1; i < 9; i++)	
             for (int j = 1; j < 9; j++) {
 		if (game.getBoxColor(i,j) == game.WHITE) 
-                    imagesFromGrid[uneCase].setImage(iconWhite);
-                else if (game.getBoxColor(i,j) == game.BLACK) 
-                    imagesFromGrid[uneCase].setImage(iconBlack);
+                    imagesFromGrid[oneBox].setImage(iconWhite);
+                if (game.getBoxColor(i,j) == game.BLACK) 
+                    imagesFromGrid[oneBox].setImage(iconBlack);
 		else if (game.getBoxColor(i, j) == game.TAKE_BY_BLACK) {
                     game.setSpecificBox(i,j, game.BLACK);
-                    imagesFromGrid[uneCase].setImage(iconBlack);
+                    imagesFromGrid[oneBox].setImage(iconBlack);
 		}else if (game.getBoxColor(i,j) == game.TAKE_BY_WHITE) {
                     game.setSpecificBox(i, j, game.WHITE);
-                    imagesFromGrid[uneCase].setImage(iconWhite);
+                    imagesFromGrid[oneBox].setImage(iconWhite);
                 }else if (game.getBoxColor(i, j) == game.EMPTY)
-                    imagesFromGrid[uneCase].setImage(iconEmpty);
+                    imagesFromGrid[oneBox].setImage(iconEmpty);
 				
-		uneCase++;
+		oneBox++;
             }
     }
     /** End In-Game Methods */
@@ -323,6 +314,7 @@ public class FXMLGameController implements Initializable {
     public int getBlackCounter() { return game.getScore(1); }
     public int getWhiteCounter() { return game.getScore(2); }
     public int getTotalPawnsTaken() { return getBlackCounter() + getWhiteCounter(); }
+    public void setStage(Stage s) { this.stage = s; }
     /**End Getters & Setters */
     
     public void save () { game.save(currentGame.getJ1().getPseudo() + "_VS_" + currentGame.getJ2().getPseudo()); }
@@ -360,6 +352,7 @@ public class FXMLGameController implements Initializable {
             stage.centerOnScreen();
             stage.setResizable(false);
             stage.setTitle("Othello - Game");
+            this.stage.close();
             stage.show();
         }catch(IOException e){
             e.printStackTrace();

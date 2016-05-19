@@ -7,16 +7,12 @@ package othello_game;
 
 import java.io.File;
 import javafx.application.Application;
-import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
-import javafx.stage.WindowEvent;
-import utils.MyDialog;
 import views.FXMLChooseGameController;
-import views.FXMLGameController;
 
 /**
  *
@@ -35,6 +31,7 @@ public class Othello_Game_FXMain extends Application {
         stage.getIcons().add(new Image("http://swap.sec.net/annex/icon.png"));
         stage.centerOnScreen();
         stage.setResizable(false);
+        controller.setStage(stage);
         stage.setTitle("Othello - Game");
         
         /*stage.setOnShowing((WindowEvent event) -> {
