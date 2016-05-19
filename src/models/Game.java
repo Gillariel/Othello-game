@@ -71,19 +71,18 @@ public class Game implements Serializable {
     public void prepareInstance() {
         
 	resetPossibleHits();
-		
-        // met à 0 la liste des modèles, le joueur en cours et met à 0 le compteur de modèle
+        
 	currentPlayer = choosenCurrentPlayer;
-		
-        // enregistre les numéros des cases graphique par rapport aux coordonnées
+        
+        //bind board with GUI positions
 	int cpt = 0;
         for (int i = 1; i < 9; i++)
             for (int j = 1; j < 9; j++) {
 		boxesNumber[i][j] = cpt;
 		cpt++;
             }
-		
-	// enregistre les lignes et colonnes par rapport aux coordonnées des cases.
+        
+	/* memorize rows and columns position*/
 	int row = 1;
 	for (int i = 0; i < 64; i++){
             if (i > 7 ) row = 2;
@@ -102,7 +101,8 @@ public class Game implements Serializable {
             columnBoxes[i] = column;
             column++;
 	}
-	
+	/** End*/
+        
         for (int i = 0; i < 32; i++){
             rowTaken[i] = 0;
             columnTaken[i] = 0;
@@ -158,6 +158,7 @@ public class Game implements Serializable {
 	boolean result = false;
 	if (board[row][column] == EMPTY) {
             int index = 0;
+            //pawns around current box
             for (int k = -1; k < 2; k++){	
 		for (int l = -1; l < 2; l++) {
                     step = 0;
@@ -165,20 +166,20 @@ public class Game implements Serializable {
 			step++;
 			i = row + (step * k);
 			j = column + (step * l);
-                    }while ((i > 0 ) && (i < 9) && (j > 0) && (j < 9) && (board[i][j] == otherColor));  
-                        //test if we're in the board and if there is a pawn of the same color
-                    if (( i > 0 ) && (i < 9)  && (j > 0) && (j < 9) && (step > 1) && (board[i][j] == color)) {
+                    }while (((i > 0 ) && (i < 9)) && ((j > 0) && (j < 9)) && (board[i][j] == otherColor));  
+                    //test if we're in the board and if there is a pawn of the same color
+                    if ((( i > 0 ) && (i < 9))  && ((j > 0) && (j < 9)) && (step > 1) && (board[i][j] == color)) {
                         result = true;
                         for (int m = 1; m < step; m++) {
-                            testRowTaken[index]= row + m*m;
-                            testColumnTaken[index] = column + l*m;
+                            testRowTaken[index]= row + m * m;
+                            testColumnTaken[index] = column + l * m;
                             index++;
                         }			
                             
-                        //execute the hit if it's said
+                        //execute the hit if it's asked
                         if (hitNeedToBePlay) {
                             for (int n = 1; n < step; n++) {
-                                // enregistre les cases prises
+                                //save taken's boxes
                                 rowTaken[index] = row + (k * n);
                                 columnTaken[index] = column + (l * n);
                                 index++;
@@ -298,8 +299,8 @@ public class Game implements Serializable {
         
         if (isCorrectPosition(row, column, color, otherColor, true)) {		
             switchPlayer();
-            resetTakenBoxes(); 
             calcScore();
+            resetTakenBoxes();
              
             if ((whiteCounter + blackCounter) < 64) {
 		if (IsWhiteUnableToPlay() == true) currentPlayer = 1;

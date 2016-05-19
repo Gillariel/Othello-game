@@ -42,9 +42,9 @@ public class FXMLChooseGameController implements Initializable {
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        TournamentManager provider = new TournamentManager();
+        /*TournamentManager provider = new TournamentManager();
             for(Pair<String,String> p : provider.selectAllVsContenders())
-                comboBoxGames.getItems().add(p);
+                comboBoxGames.getItems().add(p);*/
     }    
 
     @FXML
@@ -81,7 +81,7 @@ public class FXMLChooseGameController implements Initializable {
                 stage.getIcons().add(new Image("http://swap.sec.net/annex/icon.png"));
                 stage.centerOnScreen();
                 stage.setResizable(false);
-                stage.setFullScreen(true);
+                //stage.setFullScreen(true);
                 stage.setTitle("Othello - Game");
                 stage.show();
             }catch(IOException e) {

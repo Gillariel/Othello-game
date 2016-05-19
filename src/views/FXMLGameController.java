@@ -254,17 +254,16 @@ public class FXMLGameController implements Initializable {
 	int uneCase = 0;
 	for (int i = 1; i < 9; i++)	
             for (int j = 1; j < 9; j++) {
-                // remet les cases en couleur normale
 		if (game.getBoxColor(i,j) == game.WHITE) 
                     imagesFromGrid[uneCase].setImage(iconWhite);
                 else if (game.getBoxColor(i,j) == game.BLACK) 
                     imagesFromGrid[uneCase].setImage(iconBlack);
 		else if (game.getBoxColor(i, j) == game.TAKE_BY_BLACK) {
-                    imagesFromGrid[uneCase].setImage(iconBlack);
                     game.setSpecificBox(i,j, game.BLACK);
+                    imagesFromGrid[uneCase].setImage(iconBlack);
 		}else if (game.getBoxColor(i,j) == game.TAKE_BY_WHITE) {
-                    imagesFromGrid[uneCase].setImage(iconWhite);
                     game.setSpecificBox(i, j, game.WHITE);
+                    imagesFromGrid[uneCase].setImage(iconWhite);
                 }else if (game.getBoxColor(i, j) == game.EMPTY)
                     imagesFromGrid[uneCase].setImage(iconEmpty);
 				
