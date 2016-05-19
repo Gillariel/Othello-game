@@ -39,6 +39,12 @@ public class Game1 implements Comparable<Game1>{
     public Gamer getJ2() { return J2; }
     public int getPriority() { return priority; }
     public void setPriority(int priority) { this.priority = priority; }
+    public void setScoreJ1(int score) { J1.setScore(score); }
+    public void setScoreJ2(int score) { J2.setScore(score); }
+    public void setScores(int s1, int s2) {
+        setScoreJ1(s1);
+        setScoreJ2(s2);
+    }
     
     @Override
     public int compareTo(Game1 o) {

@@ -42,9 +42,9 @@ public class FXMLChooseGameController implements Initializable {
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        /*TournamentManager provider = new TournamentManager();
+        TournamentManager provider = new TournamentManager();
             for(Pair<String,String> p : provider.selectAllVsContenders())
-                comboBoxGames.getItems().add(p);*/
+                comboBoxGames.getItems().add(p);
     }    
 
     @FXML

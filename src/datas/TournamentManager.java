@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import javafx.util.Pair;
 import models.Game1;
+import models.Member;
 import utils.MyDialog;
 
 /**
@@ -150,4 +151,44 @@ public class TournamentManager extends DbConnect{
             return null;
         }
     }
+    
+    public int updateScore(Game1 id) {
+       try(NHDatabaseSession session = getDb()){
+           int result = 0;
+               result = session.createStatement("UPDATE Games "
+                   + "SET leftContenderScore = @scoreJ1,rightContenderScore = @scoreJ2 "
+                   + "WHERE id like @id")
+                   .bindParameter("@scoreJ1",id.getJ1().getScore())
+                   .bindParameter("@scoreJ2",id.getJ2().getScore())
+                   .bindParameter("@id",id.getId())
+                   .executeUpdate();
+           
+           return result;
+       }catch(Exception e){
+           return -1;
+       }
+   }
+    
+    
+    public List<Member> selectParticipantsScore() {
+        List<Member> list = new ArrayList<>();
+           try(NHDatabaseSession session = getDb()){
+           String[][] result = session.createStatement("select m.pseudo,sum(g.leftContenderScore) as Total " 
+                   + "from Members m " 
+                   + "join Games g on g.leftContender = m.pseudo" 
+                   + "group by m.pseudo " 
+                   + "UNION " 
+                   + "select m.pseudo,sum(g.rightContenderScore) " 
+                   + "from Members m " 
+                   + "join Games g on g.rightContender = m.pseudo " 
+                   + "group by m.pseudo " 
+                   + "order by sum(leftContenderScore) desc ;")
+                   .executeQuery();
+           for(String[] participant : result)
+               list.add(DbEntityToObject.ParticipantParser(participant));
+           return list;
+       }catch(Exception e) {
+           return null;
+       }
+   }
 }

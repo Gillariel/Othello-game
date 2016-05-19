@@ -5,6 +5,7 @@
  */
 package views;
 
+import datas.TournamentManager;
 import java.net.URL;
 import java.util.ResourceBundle;
 import javafx.application.Platform;
@@ -25,6 +26,8 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.shape.Circle;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import models.Game;
 import models.Game1;
 import models.GameController;
@@ -92,7 +95,6 @@ public class FXMLGameController implements Initializable {
      * Initializes the controller class.
      */
     
-    // Rgb color for Background pics : (10,230,65)
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         if(game != null){ ;
@@ -108,6 +110,9 @@ public class FXMLGameController implements Initializable {
         whitePawnProgressBar.progressProperty().bind(whiteScore.divide(64));
         labelBlackScore.textProperty().bind(blackScore.asString());
         labelWhiteScore.textProperty().bind(whiteScore.asString());
+        
+        labelCurrentPlayer.setFont(Font.font("Verdana", FontWeight.BOLD, 20));
+        
         
         int indice = 0;
         for(int i = 0; i < 8; i++) {
@@ -145,7 +150,7 @@ public class FXMLGameController implements Initializable {
                 game.setRowPlayed((GridPane.getRowIndex(n)+1));
                 game.setColumnPlayed((GridPane.getColumnIndex(n)+1));
                 PlayHit();
-        });
+            });
         }
     }
 
@@ -183,7 +188,7 @@ public class FXMLGameController implements Initializable {
     
     public void showCurrentPlayer() {
         labelCurrentPlayer.setText((game.getCurrentPlayer() == 1)? "Black" : "White");
-	MyDialog.dialogWithoutHeader("Turn Change", "Player " + labelCurrentPlayer.getText() + ", it's your turn !");
+	//MyDialog.dialogWithoutHeader("Turn Change", "Player " + labelCurrentPlayer.getText() + ", it's your turn !");
     }
     
     public void showScore() {
@@ -227,7 +232,6 @@ public class FXMLGameController implements Initializable {
             game.calcScore();
             showScore();
 			
-            // si un des 2 joueurs ne peut jouer on passe son tour 
             if ((getTotalPawnsTaken()) < game.NB_BOX) {
                 if (game.IsWhiteUnableToPlay() == true) game.setCurrentPlayer(game.BLACK);
 		if (game.IsBlackUnableToPlay() == true) game.setCurrentPlayer(game.WHITE);
@@ -275,6 +279,7 @@ public class FXMLGameController implements Initializable {
     
     /**Game's Manipulation */
     public void newGame() {
+        currentGame.setScores(0, 0);
 	game.prepareInstance();
 	game.initializeGame();
 	initializeBoard();
@@ -287,12 +292,18 @@ public class FXMLGameController implements Initializable {
     }
     
     public void endGame() {
+        currentGame.setScores(getBlackCounter(), getWhiteCounter());
+        TournamentManager provider = new TournamentManager();
         if (getWhiteCounter() > getBlackCounter()) {
-            MyDialog.dialog("Eng Game","Thank you for playing.","The game is finished : Whites win with " + getWhiteCounter() + "!"); 
+            MyDialog.dialog("Eng Game","Thank you for playing.","The game is finished : Whites win with " + getWhiteCounter() + "!");
+            provider.updateScore(currentGame);
+            
         }else if (getWhiteCounter() < getBlackCounter()) {
-            MyDialog.dialog("Eng Game","Thank you for playing.","The game is finished : Blacks win with " + getBlackCounter() + "!"); 
+            MyDialog.dialog("Eng Game","Thank you for playing.","The game is finished : Blacks win with " + getBlackCounter() + "!");
+            provider.updateScore(currentGame);
         }else if (getWhiteCounter() == getBlackCounter()) {
-            MyDialog.dialog("Eng Game","Thank you for playing.","The game is finished : Perfect equals (Whites = " + getWhiteCounter() + " & Blacks = " + getBlackCounter() + ")!");  
+            MyDialog.dialog("Eng Game","Thank you for playing.","The game is finished : Perfect equals (Whites = " + getWhiteCounter() + " & Blacks = " + getBlackCounter() + ")!");
+            newGame();
         }
     }
     /**End Game's Manipulation */ 

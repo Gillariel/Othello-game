@@ -71,7 +71,7 @@
             <Circle fx:id="whitePawnsCircle" fill="#fffff2" layoutX="436.0" layoutY="102.0" radius="32.0" stroke="BLACK" strokeType="INSIDE" />
             <ProgressBar fx:id="whitePawnProgressBar" layoutX="349.0" layoutY="151.0" prefHeight="18.0" prefWidth="152.0" progress="0.0" />
             <Label layoutX="581.0" layoutY="94.0" text="Joueur en cours :" />
-            <Label fx:id="labelCurrentPlayer" layoutX="612.0" layoutY="126.0" textAlignment="CENTER" />
+            <Label fx:id="labelCurrentPlayer" layoutX="589.0" layoutY="126.0" />
             <Label fx:id="labelBlackScore" layoutX="52.0" layoutY="152.0" />
             <Label fx:id="labelWhiteScore" layoutX="529.0" layoutY="152.0" />
          </children>
