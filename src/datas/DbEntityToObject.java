@@ -7,7 +7,7 @@ package datas;
 
 import java.util.List;
 //import models.Contender;
-import models.Game1;
+import models.Game;
 import models.Member;
 //import models.Member;
 
@@ -37,7 +37,7 @@ public class DbEntityToObject {
         return (entity != null)? new Contender(entity[0]): null;
     }*/
 
-    static Game1 GameParser(String[] entity) {
-        return (entity != null)? new Game1(Integer.parseInt(entity[0]), entity[1], entity[2], Integer.parseInt(entity[3])) : null;
+    static Game GameParser(String[] entity) {
+        return (entity != null)? new Game(Integer.parseInt(entity[0]), entity[1], entity[2], Integer.parseInt(entity[3])) : null;
     }
 }

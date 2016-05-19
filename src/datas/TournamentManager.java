@@ -10,7 +10,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import javafx.util.Pair;
-import models.Game1;
+import models.Game;
 import models.Member;
 import utils.MyDialog;
 
@@ -23,7 +23,7 @@ public class TournamentManager extends DbConnect{
     public TournamentManager() {super(); }
     
     // For each game : Insert Contender with it associated game + Insert the game itself 
-    public int insertGames(List<Game1> list){
+    public int insertGames(List<Game> list){
         int result0 = 0,result = 0, result1 = 0, result2 = 0;
         
         try (NHDatabaseSession session = getDb()){
@@ -33,7 +33,7 @@ public class TournamentManager extends DbConnect{
                             .bindParameter("@pseudo", "?")
                             .executeUpdate();
                 
-                for(Game1 g : list){
+                for(Game g : list){
                     if(!(g.getJ1().getPseudo().equals("?") && g.getJ2().getPseudo().equals("?"))){
                         result0 = session.createStatement("INSERT INTO Games (id,leftContenderScore, rightContenderScore,concreteType) "
                             + "VALUES (@id,0,0,0);")
@@ -105,8 +105,8 @@ public class TournamentManager extends DbConnect{
     }
     
     //Renvoie la liste des games du tour actuelle.
-    public List<Game1> selectAllGames() {
-        List<Game1> games = new ArrayList<>();
+    public List<Game> selectAllGames() {
+        List<Game> games = new ArrayList<>();
         try (NHDatabaseSession session = getDb()){
             String[][] result = session.createStatement("SELECT id, leftContender, rightContender, _priority "
                     + "FROM Games "
@@ -139,20 +139,20 @@ public class TournamentManager extends DbConnect{
         }
     }
     
-    public Game1 selectGame(String J1) {
+    public Game selectGame(String J1) {
         try (NHDatabaseSession session = getDb()){
             String[][] result = session.createStatement("SELECT id, leftContender, rightContender, _priority "
                     + "FROM Games "
                     + "WHERE leftContender = @J1;")
                     .bindParameter("@J1", J1)
                     .executeQuery(); 
-            return new Game1(Long.parseLong(result[0][0]), result[0][1], result[0][2], Integer.parseInt(result[0][3]));
+            return new Game(Long.parseLong(result[0][0]), result[0][1], result[0][2], Integer.parseInt(result[0][3]));
         }catch (Exception e) {
             return null;
         }
     }
     
-    public int updateScore(Game1 id) {
+    public int updateScore(Game id) {
         try(NHDatabaseSession session = getDb()){
             int result = 0;
                 result = session.createStatement("UPDATE Games "
@@ -210,23 +210,23 @@ public class TournamentManager extends DbConnect{
             
             int turn = selectCurrentPriority();
             
-            List<Game1> futureGames = new ArrayList<>();
+            List<Game> futureGames = new ArrayList<>();
             String[][] result = session.createStatement("SELECT id, leftContender, rightContender, _priority "
                     + "FROM Games "
                     + "WHERE _priority = @priority")
                     .bindParameter("@priority", turn + 1)
                     .executeQuery();
             for(String[] g : result)
-                futureGames.add(new Game1(Long.parseLong(g[0]), g[1], g[2], Integer.parseInt(g[3])));
+                futureGames.add(new Game(Long.parseLong(g[0]), g[1], g[2], Integer.parseInt(g[3])));
             
-            List<Game1> lastGames = new ArrayList<>();
+            List<Game> lastGames = new ArrayList<>();
             String[][] result2 = session.createStatement("SELECT id, leftContender, rightContender, _priority "
                     + "FROM Games "
                     + "WHERE _priority = @priority")
                     .bindParameter("@priority", turn)
                     .executeQuery();
             for(String[] ga : result)
-                lastGames.add(new Game1(Long.parseLong(ga[0]), ga[1], ga[2], Integer.parseInt(ga[3])));
+                lastGames.add(new Game(Long.parseLong(ga[0]), ga[1], ga[2], Integer.parseInt(ga[3])));
             
             String currentLeft = "", currentRight = "";
             long id_futureGame = 0;

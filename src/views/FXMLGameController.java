@@ -32,9 +32,8 @@ import javafx.scene.layout.Pane;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
+import models.OthelloGame;
 import models.Game;
-import models.Game1;
-import models.GameController;
 import utils.AppInfo;
 import utils.MyDialog;
 
@@ -45,10 +44,9 @@ import utils.MyDialog;
  */
 public class FXMLGameController implements Initializable {
     
-    private Game1 currentGame;
+    private Game currentGame;
     private Stage stage;
-    private Game game;
-    private GameController controller;
+    private OthelloGame game;
     private final ImageView[] imagesFromGrid = new ImageView[64];
     
     private SimpleDoubleProperty blackScore = new SimpleDoubleProperty(0);
@@ -97,11 +95,7 @@ public class FXMLGameController implements Initializable {
     
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        if(game != null){ ;
-        }else{
-        game = new Game();
-        controller = new GameController();
-        game.prepareInstance();
+        game = new OthelloGame();
         game.initializeGame();
         
         blackPawnProgressBar.setPrefWidth(150); blackPawnProgressBar.setMaxHeight(8);
@@ -113,28 +107,27 @@ public class FXMLGameController implements Initializable {
         
         labelCurrentPlayer.setFont(Font.font("Verdana", FontWeight.BOLD, 20));
         
-        
-        int indice = 0;
+        int index = 0;
         for(int i = 0; i < 8; i++) {
             for(int j = 0; j < 8; j++) {
-                indice = (i * 8) + j;
+                index = (i * 8) + j;
                 if(i == 3 && j == 3 || i == 4 && j == 4){
-                    ImageView img = new ImageView(iconWhite);
-                    imagesFromGrid[indice] = img;
-                    gridPane.add(new HBox(img), j, i);
+                    ImageView pic = new ImageView(iconWhite);
+                    imagesFromGrid[index] = pic;
+                    gridPane.add(new HBox(pic), j, i);
                 }
                 else if(i == 3 && j == 4 || i == 4 && j == 3){
-                    ImageView img = new ImageView(iconBlack);
-                    imagesFromGrid[indice] = img;
-                    gridPane.add(new HBox(img), j, i);
+                    ImageView pic = new ImageView(iconBlack);
+                    imagesFromGrid[index] = pic;
+                    gridPane.add(new HBox(pic), j, i);
                 }
                 else {
-                    ImageView img = new ImageView(iconEmpty);
-                    if(i == 0) imagesFromGrid[j] = img;
-                    if(j == 0) imagesFromGrid[i] = img;
-                    if(i == 0 && j == 0) imagesFromGrid[0] = img; 
-                    imagesFromGrid[indice] = img;
-                    gridPane.add(new HBox(img), j, i);
+                    ImageView pic = new ImageView(iconEmpty);
+                    if(i == 0) imagesFromGrid[j] = pic;
+                    if(j == 0) imagesFromGrid[i] = pic;
+                    if(i == 0 && j == 0) imagesFromGrid[0] = pic; 
+                    imagesFromGrid[index] = pic;
+                    gridPane.add(new HBox(pic), j, i);
                 }
             }
         }
@@ -146,16 +139,13 @@ public class FXMLGameController implements Initializable {
         
         for(Node n : gridPane.getChildren())
             n.addEventFilter(MouseEvent.MOUSE_PRESSED, (MouseEvent event) -> {
-                game.setPlayedBox((GridPane.getRowIndex(n))*8 +  (GridPane.getColumnIndex(n)));
-                game.setRowPlayed((GridPane.getRowIndex(n)+1));
-                game.setColumnPlayed((GridPane.getColumnIndex(n)+1));
-                PlayHit();
+                game.setPlayedBox((GridPane.getRowIndex(n)* 8) +  (GridPane.getColumnIndex(n)));
+                PlayHit();                
             });
-        }
     }
 
     /**In-Game Methods */
-    public void initializeBoard() {		
+    private void initializeBoard() {		
         for (int i = 0; i < 64; i++)
             imagesFromGrid[i].setImage(iconEmpty);
 	
@@ -164,17 +154,10 @@ public class FXMLGameController implements Initializable {
 	imagesFromGrid[35].setImage(iconBlack);
 	imagesFromGrid[36].setImage(iconWhite);
         
-	game.calcPossibleHits();
-	for (int j = 1; j < 9; j++)
-            for (int k = 1; k < 9; k++)
-                if(game.getPossibleHits()[j][k])
-                    if(game.getCurrentPlayer() == 1)
-                        imagesFromGrid[game.getBoxNumber(j,k)].setImage(iconBlackPossibility);
-                    else
-                        imagesFromGrid[game.getBoxNumber(j,k)].setImage(iconWhitePossibility);
+	showPossiblesHits();
     }
     
-    public void showPossiblesHits() {
+    private void showPossiblesHits() {
         game.calcPossibleHits();
         for(int i = 1; i < 9; i++) 
             for(int j = 1; j < 9; j++)        
@@ -185,81 +168,40 @@ public class FXMLGameController implements Initializable {
                         imagesFromGrid[game.getBoxNumber(i, j)].setImage(iconWhitePossibility);
     }
     
-    public void showCurrentPlayer() {
+    private void showCurrentPlayer() {
         labelCurrentPlayer.setText((game.getCurrentPlayer() == 1)? "Black" : "White");
     }
     
-    public void showScore() {
+    private void showScore() {
         blackScore.set(game.getScore(game.BLACK));
         whiteScore.set(game.getScore(game.WHITE));
     }
     
-    public void updateFromFile() {
-        switchPawnsColor();
-        showCurrentPlayer();
-        showPossiblesHits();
-        showScore();
-    }
-    
-    public void PlayHit() {			
-	if (game.getCurrentPlayer()== 1)
-            game.setPlayedBox(game.getPlayedBox());
-			
-	int row = game.getRow(game.getPlayedBox());		// lit la ligne de la case choisie
-	int column = game.getColumn(game.getPlayedBox());	// lit la colonne  de la case choisie
-	int color;							// couleur du joueur en cours
-	int otherColor;	
-			// récupère la couleur et le texte du joueur en cours et celle de l'autre joueur
-	if (game.getCurrentPlayer() == 1) {
-            color = game.BLACK;
-            otherColor = game.WHITE;
-        }else{
-            color = game.WHITE;
-            otherColor = game.BLACK;
-        }
-        
-        if (game.isCorrectPosition(row, column, color, otherColor, true) == true) {		
-            //Adapt GUI with the model
+    private void PlayHit() {		
+        //Adapt GUI with the model
+        if(game.play()){
             switchPawnsColor();
-            
-            //if (game.getCurrentPlayer() == game.BLACK) imagesFromGrid[game.getPlayedBox()].setImage(iconBlack);
-            //if (game.getCurrentPlayer() == game.WHITE) imagesFromGrid[game.getPlayedBox()].setImage(iconWhite);
-	
-            game.switchPlayer();
-            game.resetTakenBoxes();
-            game.calcScore();
-            showScore();
-			
-            if ((getTotalPawnsTaken()) < game.NB_BOX) {
-                if (game.IsWhiteUnableToPlay()) game.setCurrentPlayer(game.BLACK);
-		if (game.IsBlackUnableToPlay()) game.setCurrentPlayer(game.WHITE);
-            }
-
-            game.resetPossibleHits();
-            game.calcPossibleHits();
-			
+            showScore();	
             showPossiblesHits();
             showCurrentPlayer();
-			
             if ((game.isFinished()== true) || (getTotalPawnsTaken() == game.NB_BOX) || (getWhiteCounter() == 0) || (getBlackCounter() == 0)) 
-		endGame();	
+                endGame();	
 	}
-	// si mauvaise case choisie : demande au joueurs de recommencer
-	else {
+        else {
             if (getTotalPawnsTaken() < game.NB_BOX) MyDialog.warningDialog("Not Allowed", "Please choose a valid position and try again!");
             else {
                 endGame();
             }
-	}
+        }
     }
     
-    public void switchPawnsColor() {
+    private void switchPawnsColor() {
 	int oneBox = 0;
 	for (int i = 1; i < 9; i++)	
             for (int j = 1; j < 9; j++) {
 		if (game.getBoxColor(i,j) == game.WHITE) 
                     imagesFromGrid[oneBox].setImage(iconWhite);
-                if (game.getBoxColor(i,j) == game.BLACK) 
+                else if (game.getBoxColor(i,j) == game.BLACK) 
                     imagesFromGrid[oneBox].setImage(iconBlack);
 		else if (game.getBoxColor(i, j) == game.TAKE_BY_BLACK) {
                     game.setSpecificBox(i,j, game.BLACK);
@@ -277,20 +219,19 @@ public class FXMLGameController implements Initializable {
     
     
     /**Game's Manipulation */
-    public void newGame() {
+    private void newGame() {
         currentGame.setScores(0, 0);
-	game.prepareInstance();
-	game.initializeGame();
-	initializeBoard();
-	blackScore.set(getBlackCounter());
-	whiteScore.set(getWhiteCounter());
-	if (game.getCurrentPlayer() == game.BLACK)
+        game.initializeGame();
+        initializeBoard();
+        blackScore.set(getBlackCounter());
+        whiteScore.set(getWhiteCounter());
+        if (game.getCurrentPlayer() == game.BLACK)
             MyDialog.dialogWithoutHeader("Game's starting", "Blacks begins!");
-	else if (game.getCurrentPlayer() == game.WHITE)
+        else if (game.getCurrentPlayer() == game.WHITE)
             MyDialog.dialogWithoutHeader("Game's starting", "Whites begins!");
     }
     
-    public void endGame() {
+    private void endGame() {
         currentGame.setScores(getBlackCounter(), getWhiteCounter());
         TournamentManager provider = new TournamentManager();
         if (getWhiteCounter() > getBlackCounter()) {
@@ -309,38 +250,30 @@ public class FXMLGameController implements Initializable {
     /**End Game's Manipulation */ 
     
     /** Getters & Setters */
-    public Game getGame() {return game; }
-    public void setCurrentGame(Game1 g) { this.currentGame = g; }
+    public OthelloGame getGame() {return game; }
+    public void setCurrentGame(Game g) { this.currentGame = g; }
     public int getBlackCounter() { return game.getScore(1); }
     public int getWhiteCounter() { return game.getScore(2); }
     public int getTotalPawnsTaken() { return getBlackCounter() + getWhiteCounter(); }
     public void setStage(Stage s) { this.stage = s; }
     /**End Getters & Setters */
     
+    /** Save Management */
     public void save () { game.save(currentGame.getJ1().getPseudo() + "_VS_" + currentGame.getJ2().getPseudo()); }
-    public void load() { game = game.load(currentGame.getJ1().getPseudo() + "_VS_" + currentGame.getJ2().getPseudo()); }
-    
-    @FXML
-    private void handleSaveGame(ActionEvent event) {
-    }
-
-    @FXML
-    private void handleCloseGame(ActionEvent event) {
-        if(MyDialog.confirmationDialog("Exit", "You are exiting the game.", "Are you sure you want to quit?"))
-            Platform.exit();
-    }
-
-    @FXML
-    private void handleAbout(ActionEvent event) {
-        AppInfo.showLicence();
-    }
-
-    @FXML
-    private void handleRules(ActionEvent event) {
-        AppInfo.showRules();
+    public void load() {
+        game = game.load(currentGame.getJ1().getPseudo() + "_VS_" + currentGame.getJ2().getPseudo());
+        updateFromFile();
     }
     
-    public void launchChooseGame() {
+    private void updateFromFile() {
+        switchPawnsColor();
+        showCurrentPlayer();
+        showPossiblesHits();
+        showScore();
+    }
+    /** End Save Management */
+    
+    private void launchChooseGame() {
         try{
             FXMLLoader loaderFXML = new FXMLLoader(getClass().getResource("/views/FXMLChooseGame.fxml"));
             Parent root = (Parent) loaderFXML.load();
@@ -357,5 +290,30 @@ public class FXMLGameController implements Initializable {
         }catch(IOException e){
             e.printStackTrace();
         }
+    }
+    
+    @FXML
+    private void handleSaveGame(ActionEvent event) {
+        if(MyDialog.confirmationDialog("Save", "You are saving the game.", "Are you sure you want to save it?"))    
+            save();
+    }
+
+    @FXML
+    private void handleCloseGame(ActionEvent event) {
+        if(MyDialog.confirmationDialog("Exit", "You are exiting the game.", "Are you sure you want to quit?"))
+            if(getGame().getScore(1) > 2 || getGame().getScore(2) > 2)
+                if(MyDialog.confirmationDialog("Save", "The game is not finished!", "Do you want to save it in a specific file?"))
+                    save();
+            Platform.exit();
+    }
+
+    @FXML
+    private void handleAbout(ActionEvent event) {
+        AppInfo.showLicence();
+    }
+
+    @FXML
+    private void handleRules(ActionEvent event) {
+        AppInfo.showRules();
     }
 }

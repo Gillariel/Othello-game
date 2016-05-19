@@ -33,20 +33,6 @@ public class Othello_Game_FXMain extends Application {
         stage.setResizable(false);
         controller.setStage(stage);
         stage.setTitle("Othello - Game");
-        
-        /*stage.setOnShowing((WindowEvent event) -> {
-            if(controllerFileExists("game"))
-                if(MyDialog.confirmationDialog("Load", "blablabla", "A save from an old game is in your directory, do you want to load it?")) {
-                    controller.load();
-                    controller.updateFromFile();
-                }
-        });
-        
-        stage.setOnCloseRequest((WindowEvent event) -> {
-            if(controller.getGame().getBlackCounter() > 2 || controller.getGame().getWhiteCounter() > 2)
-                if(MyDialog.confirmationDialog("Save", "Game not finished!", "Do you want to save the game?"))
-                    controller.save();
-        });*/
         stage.show();
     }
 

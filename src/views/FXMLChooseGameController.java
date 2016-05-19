@@ -6,6 +6,7 @@
 package views;
 
 import datas.TournamentManager;
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -20,8 +21,9 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 import javafx.util.Pair;
-import models.Game1;
+import models.Game;
 import utils.Log;
 import utils.MyDialog;
 
@@ -31,8 +33,6 @@ import utils.MyDialog;
  * @author User
  */
 public class FXMLChooseGameController implements Initializable {
-
-    private Game1 game;
     
     private Stage stage;
     
@@ -51,35 +51,27 @@ public class FXMLChooseGameController implements Initializable {
                 if(p != null)
                     comboBoxGames.getItems().add(p);
                 else
-                    provider.generateNextTurn();
+                    if(MyDialog.confirmationDialog("Next Turn", "No games left", "Do you want ti generate the next turn?"))
+                        provider.generateNextTurn();
+                    else
+                        Platform.exit();
     }    
 
     @FXML
     private void handle_btn_play(ActionEvent event) {
-        if(comboBoxGames.getSelectionModel().isEmpty()){
+        if(comboBoxGames.getSelectionModel().isEmpty())
             MyDialog.warningDialog("Warning", "You need to chosse one game before playing !");
-            try{
-                Parent root = FXMLLoader.load(getClass().getResource("/views/FXMLGame.fxml"));
-                Scene scene = new Scene(root);
-                scene.getStylesheets().add(getClass().getResource("/ressources/ProgressBar.css").toExternalForm());
-                Stage stage = new Stage();
-                stage.setScene(scene);
-                stage.getIcons().add(new Image("http://swap.sec.net/annex/icon.png"));
-                stage.centerOnScreen();
-                stage.setResizable(true);
-                stage.setTitle("Othello - Game");
-                stage.show();
-            }catch(IOException e) {
-                MyDialog.warningDialog("Warning", "Error while loading the game window, please try again.");
-            }
-        
-        }else{
+        else{
             TournamentManager provider = new TournamentManager();
-            Game1 game = provider.selectGame(comboBoxGames.getSelectionModel().getSelectedItem().getKey());
+            Game game = provider.selectGame(comboBoxGames.getSelectionModel().getSelectedItem().getKey());
             try{
                 FXMLLoader loaderFXML = new FXMLLoader(getClass().getResource("/views/FXMLGame.fxml"));
                 Parent root = (Parent) loaderFXML.load();
                 FXMLGameController controller = loaderFXML.getController();
+                if(saveFileExist(game.getJ1().getPseudo() + "_VS_" + game.getJ2().getPseudo())){
+                    if(MyDialog.confirmationDialog("Load", "you are loading an old game.", "A save from an old game is in your directory, do you want to load it?"))
+                        controller.load();
+                }
                 controller.setCurrentGame(game);
                 Scene scene = new Scene(root);
                 scene.getStylesheets().add(getClass().getResource("/ressources/ProgressBar.css").toExternalForm());
@@ -90,6 +82,7 @@ public class FXMLChooseGameController implements Initializable {
                 stage.setResizable(false);
                 stage.setFullScreen(true);
                 stage.setTitle("Othello - Game");
+                setOnCloseRequest(stage, controller);
                 controller.setStage(stage);
                 stage.show();
                 this.stage.close();
@@ -100,4 +93,17 @@ public class FXMLChooseGameController implements Initializable {
     }
 
     public void setStage(Stage s) { this.stage = s; }
+    
+    private boolean saveFileExist(String name) {
+        File file = new File(name + ".sav");
+        return file.exists();
+    }
+    
+    private void setOnCloseRequest(Stage stage, FXMLGameController controller) {
+        stage.setOnCloseRequest((WindowEvent e) -> {
+            if(controller.getGame().getScore(1) > 2 || controller.getGame().getScore(2) > 2)
+                if(MyDialog.confirmationDialog("Save", "The game is not finished!", "Do you want to save it in a specific file?"))
+                    controller.save();
+        });
+    }
 }
