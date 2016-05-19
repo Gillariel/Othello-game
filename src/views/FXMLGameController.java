@@ -305,10 +305,11 @@ public class FXMLGameController implements Initializable {
         if (getWhiteCounter() > getBlackCounter()) {
             MyDialog.dialog("Eng Game","Thank you for playing.","The game is finished : Whites win with " + getWhiteCounter() + "!");
             provider.updateScore(currentGame);
-            
+            launchChooseGame();
         }else if (getWhiteCounter() < getBlackCounter()) {
             MyDialog.dialog("Eng Game","Thank you for playing.","The game is finished : Blacks win with " + getBlackCounter() + "!");
             provider.updateScore(currentGame);
+            launchChooseGame();
         }else if (getWhiteCounter() == getBlackCounter()) {
             MyDialog.dialog("Eng Game","Thank you for playing.","The game is finished : Perfect equals (Whites = " + getWhiteCounter() + " & Blacks = " + getBlackCounter() + ")!");
             newGame();
@@ -359,6 +360,7 @@ public class FXMLGameController implements Initializable {
             stage.centerOnScreen();
             stage.setResizable(false);
             stage.setTitle("Othello - Game");
+            stage.show();
         }catch(IOException e){
             e.printStackTrace();
         }
