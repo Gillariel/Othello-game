@@ -9,6 +9,7 @@ import datas.TournamentManager;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -46,6 +47,8 @@ public class FXMLChooseGameController implements Initializable {
             for(Pair<String,String> p : provider.selectAllVsContenders())
                 if(p != null)
                     comboBoxGames.getItems().add(p);
+                else
+                    generateNextTurn();
     }    
 
     @FXML
@@ -85,9 +88,14 @@ public class FXMLChooseGameController implements Initializable {
                 stage.setFullScreen(true);
                 stage.setTitle("Othello - Game");
                 stage.show();
+                
             }catch(IOException e) {
                 MyDialog.warningDialog("Warning", "Error while loading the game window, please try again.");
             }
         }
+    }
+
+    private void generateNextTurn() {
+        
     }
 }

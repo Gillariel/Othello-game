@@ -112,7 +112,7 @@ public class TournamentManager extends DbConnect{
                     + "FROM Games "
                     + "WHERE _priority = (SELECT _priority "
                                       + "FROM Games "
-                                      + "WHERE leftContender != '?');")
+                                      + "WHERE leftContender != '?' AND winner IS NULL);")
                 .executeQuery();
             for(String[] game : result) 
                 games.add(DbEntityToObject.GameParser(game));
@@ -129,7 +129,7 @@ public class TournamentManager extends DbConnect{
                     + "FROM Games "
                     + "WHERE _priority = (SELECT Min(_priority) "
                                       + "FROM Games "
-                                      + "WHERE leftContender != '?');")
+                                      + "WHERE leftContender != '?' AND winner IS NULL);")
                     .executeQuery();
             for(String[] g : result) 
                 games.add(new Pair<String,String>(g[0], g[1]));
@@ -153,42 +153,119 @@ public class TournamentManager extends DbConnect{
     }
     
     public int updateScore(Game1 id) {
-       try(NHDatabaseSession session = getDb()){
-           int result = 0;
-               result = session.createStatement("UPDATE Games "
-                   + "SET leftContenderScore = @scoreJ1,rightContenderScore = @scoreJ2 "
-                   + "WHERE id like @id")
-                   .bindParameter("@scoreJ1",id.getJ1().getScore())
-                   .bindParameter("@scoreJ2",id.getJ2().getScore())
-                   .bindParameter("@id",id.getId())
-                   .executeUpdate();
+        try(NHDatabaseSession session = getDb()){
+            int result = 0;
+                result = session.createStatement("UPDATE Games "
+                    + "SET leftContenderScore = @scoreJ1,rightContenderScore = @scoreJ2 "
+                    + "WHERE id like @id")
+                    .bindParameter("@scoreJ1",id.getJ1().getScore())
+                    .bindParameter("@scoreJ2",id.getJ2().getScore())
+                    .bindParameter("@id",id.getId())
+                    .executeUpdate();
            
-           return result;
-       }catch(Exception e){
-           return -1;
-       }
-   }
+            return result;
+        }catch(Exception e){
+            return -1;
+        }
+    }
     
     
     public List<Member> selectParticipantsScore() {
         List<Member> list = new ArrayList<>();
-           try(NHDatabaseSession session = getDb()){
-           String[][] result = session.createStatement("select m.pseudo,sum(g.leftContenderScore) as Total " 
-                   + "from Members m " 
-                   + "join Games g on g.leftContender = m.pseudo" 
-                   + "group by m.pseudo " 
-                   + "UNION " 
-                   + "select m.pseudo,sum(g.rightContenderScore) " 
-                   + "from Members m " 
-                   + "join Games g on g.rightContender = m.pseudo " 
-                   + "group by m.pseudo " 
-                   + "order by sum(leftContenderScore) desc ;")
-                   .executeQuery();
-           for(String[] participant : result)
-               list.add(DbEntityToObject.ParticipantParser(participant));
-           return list;
-       }catch(Exception e) {
-           return null;
+            try(NHDatabaseSession session = getDb()){
+            String[][] result = session.createStatement("select m.pseudo,sum(g.leftContenderScore) as Total " 
+                    + "from Members m " 
+                    + "join Games g on g.leftContender = m.pseudo" 
+                    + "group by m.pseudo " 
+                    + "UNION " 
+                    + "select m.pseudo,sum(g.rightContenderScore) " 
+                    + "from Members m " 
+                    + "join Games g on g.rightContender = m.pseudo " 
+                    + "group by m.pseudo " 
+                    + "order by sum(leftContenderScore) desc ;")
+                    .executeQuery();
+            for(String[] participant : result)
+                list.add(DbEntityToObject.ParticipantParser(participant));
+            return list;
+        }catch(Exception e) {
+            return null;
+        }
+    }
+    
+    public int selectCurrentPriority(){
+        try (NHDatabaseSession session = getDb()){
+            String[][] result = session.createStatement("SELECT _priority "
+                    + "FROM Games "
+                    + "WHERE leftContender != '?'")
+                    .executeQuery();
+            return Integer.parseInt(result[0][0]);
+        }catch (Exception e) {
+            return -1;
+        }
+    }
+    
+    public int generateNextTurn() {
+        try (NHDatabaseSession session = getDb()){
+            getDb().openTransaction();
+            
+            int turn = selectCurrentPriority();
+            
+            List<Game1> futureGames = new ArrayList<>();
+            String[][] result = session.createStatement("SELECT id, leftContender, rightContender, _priority "
+                    + "FROM Games "
+                    + "WHERE _priority = @priority")
+                    .bindParameter("@priority", turn + 1)
+                    .executeQuery();
+            for(String[] g : result)
+                futureGames.add(new Game1(Long.parseLong(g[0]), g[1], g[2], Integer.parseInt(g[3])));
+            
+            List<Game1> lastGames = new ArrayList<>();
+            String[][] result2 = session.createStatement("SELECT id, leftContender, rightContender, _priority "
+                    + "FROM Games "
+                    + "WHERE _priority = @priority")
+                    .bindParameter("@priority", turn)
+                    .executeQuery();
+            for(String[] ga : result)
+                lastGames.add(new Game1(Long.parseLong(ga[0]), ga[1], ga[2], Integer.parseInt(ga[3])));
+            
+            String currentLeft = "", currentRight = "";
+            long id_futureGame = 0;
+            int resultFromUpdate = 0;
+            
+            for(int i = 0; i < lastGames.size(); i++) {
+                if(i%2 == 0){
+                    currentLeft = lastGames.get(i).getWinner();
+                }else if(i%2 == 1){
+                    currentRight = lastGames.get(i).getWinner();
+                }else if(currentLeft != "" && currentRight != ""){
+                    id_futureGame = futureGames.get(i/2).getId();
+                    resultFromUpdate += updateGame(id_futureGame, currentLeft, currentRight);
+                }
+            }
+            
+            if(resultFromUpdate > 0){
+                getDb().rollback();
+            }else{
+                getDb().commit();
+            }
+            return resultFromUpdate;
+        }catch (Exception e) {
+            return -1;
+        }
+    }
+
+    private int updateGame(long id, String currentLeft, String currentRight) {
+        try(NHDatabaseSession session = getDb()){
+            int result = session.createStatement("UPDATE Games "
+                    + "SET leftContender = @J1, rightContender = @J2 "
+                    + "WHERE id LIKE @id;")
+                    .bindParameter("@J1", currentLeft)
+                    .bindParameter("@J2", currentRight)
+                    .bindParameter("@id", id)
+                    .executeUpdate();
+            return result;
+       }catch(Exception e){
+           return -1;
        }
-   }
+    }
 }

@@ -43,6 +43,8 @@ public class Game1 implements Comparable<Game1>{
         setScoreJ2(s2);
     }
     
+    public String getWinner(){ return (J1.getScore() > J2.getScore())? J1.getPseudo() : J2.getPseudo(); }
+    
     @Override
     public int compareTo(Game1 o) {
         return this.getPriority() - o.priority;
