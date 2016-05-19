@@ -6,14 +6,18 @@
 package views;
 
 import datas.TournamentManager;
+import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
@@ -28,6 +32,7 @@ import javafx.scene.layout.Pane;
 import javafx.scene.shape.Circle;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
+import javafx.stage.Stage;
 import models.Game;
 import models.Game1;
 import models.GameController;
@@ -339,4 +344,21 @@ public class FXMLGameController implements Initializable {
         AppInfo.showRules();
     }
     
+    public void launchChooseGame() {
+        try{
+            FXMLLoader loaderFXML = new FXMLLoader(getClass().getResource("/views/FXMLChooseGame.fxml"));
+            Parent root = (Parent) loaderFXML.load();
+            FXMLChooseGameController controller = loaderFXML.getController();
+            Scene scene = new Scene(root);
+            scene.getStylesheets().add(getClass().getResource("/ressources/ProgressBar.css").toExternalForm());
+            Stage stage = new Stage();
+            stage.setScene(scene);
+            stage.getIcons().add(new Image("http://swap.sec.net/annex/icon.png"));
+            stage.centerOnScreen();
+            stage.setResizable(false);
+            stage.setTitle("Othello - Game");
+        }catch(IOException e){
+            e.printStackTrace();
+        }
+    }
 }

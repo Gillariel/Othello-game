@@ -29,16 +29,12 @@ public class Othello_Game_FXMain extends Application {
         FXMLLoader loaderFXML = new FXMLLoader(getClass().getResource("/views/FXMLChooseGame.fxml"));
         Parent root = (Parent) loaderFXML.load();
         FXMLChooseGameController controller = loaderFXML.getController();
-        /*FXMLLoader loaderFXML = new FXMLLoader(getClass().getResource("/views/FXMLGame.fxml"));
-        Parent root = (Parent) loaderFXML.load();
-        FXMLGameController controller = loaderFXML.getController();*/
         Scene scene = new Scene(root);
         scene.getStylesheets().add(getClass().getResource("/ressources/ProgressBar.css").toExternalForm());
         stage.setScene(scene);
         stage.getIcons().add(new Image("http://swap.sec.net/annex/icon.png"));
         stage.centerOnScreen();
         stage.setResizable(false);
-        //stage.setFullScreen(true);
         stage.setTitle("Othello - Game");
         
         /*stage.setOnShowing((WindowEvent event) -> {
@@ -68,5 +64,4 @@ public class Othello_Game_FXMain extends Application {
         File file = new File(name + ".sav");
         return file.exists();
     }
-    
 }
