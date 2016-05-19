@@ -27,7 +27,7 @@ public class Game1 implements Comparable<Game1>{
         this.priority = priority;
     }
 
-    public Game1(int ID, String id1, String id2, int priority) {
+    public Game1(long ID, String id1, String id2, int priority) {
         this.ID = ID;
         J1 = new Gamer(id1);
         J2 = new Gamer(id2);

@@ -209,9 +209,9 @@ public class FXMLGameController implements Initializable {
     }
     
     public void PlayHit() {			
-	/*if (game.joueurEnCours() == 1)
-            game.setCaseJouer(game.choixCase());
-	*/		
+	if (game.getCurrentPlayer()== 1)
+            game.setPlayedBox(game.getPlayedBox());
+			
 	int row = game.getRow(game.getPlayedBox());		// lit la ligne de la case choisie
 	int column = game.getColumn(game.getPlayedBox());	// lit la colonne  de la case choisie
 	int color;							// couleur du joueur en cours
@@ -255,7 +255,10 @@ public class FXMLGameController implements Initializable {
 	// si mauvaise case choisie : demande au joueurs de recommencer
 	else {
             if (getTotalPawnsTaken() < game.NB_BOX) MyDialog.warningDialog("Not Allowed", "Please choose a valid position and try again!");
-            else MyDialog.confirmationDialog("End Game", "It's Over!", "Do you want to play the following game?");
+            else {
+                endGame();
+                //MyDialog.confirmationDialog("End Game", "It's Over!", "Do you want to play the following game?");
+            }
 	}
     }
     
@@ -348,7 +351,6 @@ public class FXMLGameController implements Initializable {
         try{
             FXMLLoader loaderFXML = new FXMLLoader(getClass().getResource("/views/FXMLChooseGame.fxml"));
             Parent root = (Parent) loaderFXML.load();
-            FXMLChooseGameController controller = loaderFXML.getController();
             Scene scene = new Scene(root);
             scene.getStylesheets().add(getClass().getResource("/ressources/ProgressBar.css").toExternalForm());
             Stage stage = new Stage();

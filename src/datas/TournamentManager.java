@@ -108,11 +108,11 @@ public class TournamentManager extends DbConnect{
     public List<Game1> selectAllGames() {
         List<Game1> games = new ArrayList<>();
         try (NHDatabaseSession session = getDb()){
-            String[][] result = session.createStatement("SELECT id, leftContenders, rightContenders, _priority "
-                    + "FROM Games  "
+            String[][] result = session.createStatement("SELECT id, leftContender, rightContender, _priority "
+                    + "FROM Games "
                     + "WHERE _priority = (SELECT _priority "
                                       + "FROM Games "
-                                      + "WHERE LeftContenders IS NOT NULL;")
+                                      + "WHERE leftContender != '?');")
                 .executeQuery();
             for(String[] game : result) 
                 games.add(DbEntityToObject.GameParser(game));
@@ -129,7 +129,7 @@ public class TournamentManager extends DbConnect{
                     + "FROM Games "
                     + "WHERE _priority = (SELECT Min(_priority) "
                                       + "FROM Games "
-                                      + "WHERE LeftContender != '?');")
+                                      + "WHERE leftContender != '?');")
                     .executeQuery();
             for(String[] g : result) 
                 games.add(new Pair<String,String>(g[0], g[1]));
@@ -141,12 +141,12 @@ public class TournamentManager extends DbConnect{
     
     public Game1 selectGame(String J1) {
         try (NHDatabaseSession session = getDb()){
-            String[][] result = session.createStatement("SELECT id, leftContenders, rightContenders, _priority"
+            String[][] result = session.createStatement("SELECT id, leftContender, rightContender, _priority "
                     + "FROM Games "
                     + "WHERE leftContender = @J1;")
                     .bindParameter("@J1", J1)
                     .executeQuery(); 
-            return new Game1(Integer.parseInt(result[0][0]), result[0][1], result[0][2], Integer.parseInt(result[0][3]));
+            return new Game1(Long.parseLong(result[0][0]), result[0][1], result[0][2], Integer.parseInt(result[0][3]));
         }catch (Exception e) {
             return null;
         }
