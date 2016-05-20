@@ -31,6 +31,15 @@ public class Game implements Comparable<Game>{
         this.priority = priority;
     }
     
+    public Game(long ID, String id1, String id2, long score1, long score2, int priority) {
+        this.ID = ID;
+        J1 = new Gamer(id1);
+        J2 = new Gamer(id2);
+        J1.setScore(score1);
+        J2.setScore(score2);
+        this.priority = priority;
+    }
+    
     public long getId() { return ID; }
     public Gamer getJ1() { return J1; }
     public Gamer getJ2() { return J2; }

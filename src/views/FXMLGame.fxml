@@ -63,16 +63,18 @@
             <Label fx:id="labelCurrentPlayer" layoutX="589.0" layoutY="126.0" />
             <Label fx:id="labelBlackScore" layoutX="52.0" layoutY="152.0" />
             <Label fx:id="labelWhiteScore" layoutX="529.0" layoutY="152.0" />
-            <ImageView fitHeight="60.0" fitWidth="56.0" layoutX="152.0" layoutY="73.0" pickOnBounds="true" preserveRatio="true">
+            <ImageView fitHeight="60.0" fitWidth="56.0" layoutX="152.0" layoutY="55.0" pickOnBounds="true" preserveRatio="true">
                <image>
                   <Image url="@../ressources/Rerversi_StaticBlack.png" />
                </image>
             </ImageView>
-            <ImageView fitHeight="56.0" fitWidth="90.0" layoutX="381.0" layoutY="73.0" pickOnBounds="true" preserveRatio="true">
+            <ImageView fitHeight="56.0" fitWidth="90.0" layoutX="381.0" layoutY="55.0" pickOnBounds="true" preserveRatio="true">
                <image>
                   <Image url="@../ressources/Rerversi_StaticWhite.png" />
                </image>
             </ImageView>
+            <Label fx:id="labelJ1pseudo" layoutX="152.0" layoutY="126.0" text="Label" />
+            <Label fx:id="labelJ2pseudo" layoutX="381.0" layoutY="126.0" text="Label" />
          </children>
       </Pane>
    </children>

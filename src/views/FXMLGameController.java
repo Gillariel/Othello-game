@@ -88,6 +88,10 @@ public class FXMLGameController implements Initializable {
     private Label labelBlackScore;
     @FXML
     private Label labelWhiteScore;
+    @FXML
+    private Label labelJ2pseudo;
+    @FXML
+    private Label labelJ1pseudo;
     
     /**
      * Initializes the controller class.
@@ -106,6 +110,9 @@ public class FXMLGameController implements Initializable {
         labelWhiteScore.textProperty().bind(whiteScore.asString());
         
         labelCurrentPlayer.setFont(Font.font("Verdana", FontWeight.BOLD, 20));
+        
+        labelJ1pseudo.setText(currentGame.getJ1().getPseudo());
+        labelJ2pseudo.setText(currentGame.getJ2().getPseudo());
         
         int index = 0;
         for(int i = 0; i < 8; i++) {

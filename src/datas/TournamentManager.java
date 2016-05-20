@@ -18,93 +18,10 @@ import utils.MyDialog;
  *
  * @author Sev
  */
-public class TournamentManager extends DbConnect{
+public class TournamentManager extends DbConnect {
 
     public TournamentManager() {super(); }
     
-    // For each game : Insert Contender with it associated game + Insert the game itself 
-    public int insertGames(List<Game> list){
-        int result0 = 0,result = 0, result1 = 0, result2 = 0;
-        
-        try (NHDatabaseSession session = getDb()){
-            session.openTransaction();
-            
-                result1 = session.createStatement("INSERT INTO CONTENDERS (pseudo, id_game) VALUES (@pseudo, 0);")
-                            .bindParameter("@pseudo", "?")
-                            .executeUpdate();
-                
-                for(Game g : list){
-                    if(!(g.getJ1().getPseudo().equals("?") && g.getJ2().getPseudo().equals("?"))){
-                        result0 = session.createStatement("INSERT INTO Games (id,leftContenderScore, rightContenderScore,concreteType) "
-                            + "VALUES (@id,0,0,0);")
-                            .bindParameter("@id",g.getId())
-                            .executeUpdate();
-                
-                        result1 = session.createStatement("INSERT INTO CONTENDERS (pseudo, id_game) VALUES (@pseudo, @id);")
-                            .bindParameter("@pseudo", g.getJ1().getPseudo())
-                            .bindParameter("@id", g.getId())
-                            .executeUpdate();
-                
-                        result2 = session.createStatement("INSERT INTO CONTENDERS (pseudo, id_game) VALUES (@pseudo, @id);")
-                            .bindParameter("@pseudo", g.getJ2().getPseudo())
-                            .bindParameter("@id", g.getId())
-                            .executeUpdate();
-                    
-                        result = session.createStatement("INSERT INTO LeafGames (id,leftContender,rightContender) "
-                            + "VALUES (@id, @J1, @J2);")
-                            .bindParameter("@id",g.getId())
-                            .bindParameter("@J1",g.getJ1().getPseudo())
-                            .bindParameter("@J2",g.getJ2().getPseudo())
-                            .executeUpdate();
-                        
-                    System.out.println(session.getLastError());
-                    }else if(g.getJ2().getPseudo().equals("?")){
-                        result2 = session.createStatement("INSERT INTO CONTENDERS (pseudo, id_game) VALUES (@pseudo, @id);")
-                            .bindParameter("@pseudo", g.getJ1().getPseudo())
-                            .bindParameter("@id", g.getId())
-                            .executeUpdate();
-                        
-                        result = session.createStatement("INSERT INTO LeafGames (id,leftContender,rightContender) "
-                            + "VALUES (@id, '?', '?');")
-                            .bindParameter("@id",g.getId())
-                            .executeUpdate();
-                        
-                    }else{
-                        result = session.createStatement("INSERT INTO LeafGames (id,leftContender,rightContender) "
-                            + "VALUES (@id, '?', '?');")
-                            .bindParameter("@id",g.getId())
-                            .executeUpdate();
-                    }
-                }
-            
-            if(result0 + result + result1 + result2 < 0){
-               session.rollback();
-               return -1;
-            }else{
-                session.commit();
-            }
-            
-            return result;
-        }catch (Exception e) {
-            return -1;
-        }
-    }
-    
-    public List<Pair<String, String>> selectAllContenders() {
-        List<Pair<String,String>> contenders = new ArrayList<>();
-        try (NHDatabaseSession session = getDb()){
-            String[][] result = session.createStatement("SELECT id_game, pseudo "
-                    + "FROM CONTENDERS")
-                    .executeQuery();
-            for(String[] contender : result) 
-                contenders.add(new Pair<String,String>(contender[0], contender[1]));
-            return contenders;
-        }catch (Exception e) {
-            return null;
-        }
-    }
-    
-    //Renvoie la liste des games du tour actuelle.
     public List<Game> selectAllGames() {
         List<Game> games = new ArrayList<>();
         try (NHDatabaseSession session = getDb()){
@@ -220,14 +137,14 @@ public class TournamentManager extends DbConnect{
                 futureGames.add(new Game(Long.parseLong(g[0]), g[1], g[2], Integer.parseInt(g[3])));
             
             List<Game> lastGames = new ArrayList<>();
-            String[][] result2 = session.createStatement("SELECT id, leftContender, rightContender, _priority "
+            String[][] result2 = session.createStatement("SELECT id, leftContender, rightContender, leftContenderScore, rightContenderScore, _priority "
                     + "FROM Games "
                     + "WHERE _priority = @priority; ")
                     .bindParameter("@priority", turn)
                     .executeQuery();
-            for(String[] ga : result)
-                lastGames.add(new Game(Long.parseLong(ga[0]), ga[1], ga[2], Integer.parseInt(ga[3])));
-            
+            for(String[] ga : result){
+                lastGames.add(new Game(Long.parseLong(ga[0]), ga[1], ga[2], Long.parseLong(ga[3]), Long.parseLong(ga[4]), Integer.parseInt(ga[5])));
+            }
             String currentLeft = "", currentRight = "";
             long id_futureGame = 0;
             int resultFromUpdate = 0;
@@ -241,15 +158,16 @@ public class TournamentManager extends DbConnect{
                 if(currentLeft != "" && currentRight != ""){
                     id_futureGame = futureGames.get(i/2).getId();
                     resultFromUpdate += updateGame(id_futureGame, currentLeft, currentRight);
+                    currentLeft = ""; currentRight = "";
                 }
             }
             
-            //if(resultFromUpdate > 0){
-              //  getDb().rollback();
-            //}else{
+            if(resultFromUpdate > 0){
+                getDb().rollback();
+            }else{
                 session.commit();
                 System.out.println(session.getLastError());
-            //}
+            }
             return resultFromUpdate;
         }catch (Exception e) {
             
