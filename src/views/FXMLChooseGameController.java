@@ -9,6 +9,8 @@ import datas.TournamentManager;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.ResourceBundle;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -47,43 +49,32 @@ public class FXMLChooseGameController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         TournamentManager provider = new TournamentManager();
-            for(Pair<String,String> p : provider.selectAllVsContenders())
-                if(p != null)
+        List<Pair<String,String>> list = new ArrayList<>(); 
+        list = provider.selectAllVsContenders();
+        boolean b = false;
+            for(Pair<String,String> p : list){
+                if(!p.getKey().equals("?")){
                     comboBoxGames.getItems().add(p);
+                    b = true;
+                }
+            }
+            if(!b){
+                if(MyDialog.confirmationDialog("Next Turn", "No games left", "Do you want to generate the next turn?")) {
+                    TournamentManager t = new TournamentManager();
+                    t.generateNextTurn();
+                        //for(Pair<String,String> f : t.selectAllVsContenders())
+                           // comboBoxGames.getItems().add(f);
+                }
                 else
-                    if(MyDialog.confirmationDialog("Next Turn", "No games left", "Do you want ti generate the next turn?")) {
-                        provider.generateNextTurn();
-                        for(Pair<String,String> pr : provider.selectAllVsContenders())
-                            comboBoxGames.getItems().add(pr);
-                    }
-                    else
-                        Platform.exit();
+                    Platform.exit();
+            }
+            
     }    
 
     @FXML
     private void handle_btn_play(ActionEvent event) {
         if(comboBoxGames.getSelectionModel().isEmpty()){
             MyDialog.warningDialog("Warning", "You need to chosse one game before playing !");
-            try{
-                FXMLLoader loaderFXML = new FXMLLoader(getClass().getResource("/views/FXMLGame.fxml"));
-                Parent root = (Parent) loaderFXML.load();
-                FXMLGameController controller = loaderFXML.getController();
-                Scene scene = new Scene(root);
-                scene.getStylesheets().add(getClass().getResource("/ressources/ProgressBar.css").toExternalForm());
-                Stage stage = new Stage();
-                stage.setScene(scene);
-                stage.getIcons().add(new Image("http://swap.sec.net/annex/icon.png"));
-                stage.centerOnScreen();
-                stage.setResizable(false);
-                stage.setFullScreen(true);
-                stage.setTitle("Othello - Game");
-                setOnCloseRequest(stage, controller);
-                controller.setStage(stage);
-                stage.show();
-                this.stage.close();
-            }catch(IOException e) {
-                MyDialog.warningDialog("Warning", "Error while loading the game window, please try again.");
-            }
         }
         else{
             TournamentManager provider = new TournamentManager();
@@ -92,11 +83,11 @@ public class FXMLChooseGameController implements Initializable {
                 FXMLLoader loaderFXML = new FXMLLoader(getClass().getResource("/views/FXMLGame.fxml"));
                 Parent root = (Parent) loaderFXML.load();
                 FXMLGameController controller = loaderFXML.getController();
+                controller.setCurrentGame(game);
                 if(saveFileExist(game.getJ1().getPseudo() + "_VS_" + game.getJ2().getPseudo())){
                     if(MyDialog.confirmationDialog("Load", "you are loading an old game.", "A save from an old game is in your directory, do you want to load it?"))
                         controller.load();
                 }
-                controller.setCurrentGame(game);
                 Scene scene = new Scene(root);
                 scene.getStylesheets().add(getClass().getResource("/ressources/ProgressBar.css").toExternalForm());
                 Stage stage = new Stage();

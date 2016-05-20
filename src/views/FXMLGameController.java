@@ -123,9 +123,6 @@ public class FXMLGameController implements Initializable {
                 }
                 else {
                     ImageView pic = new ImageView(iconEmpty);
-                    if(i == 0) imagesFromGrid[i] = pic;
-                    if(j == 0) imagesFromGrid[j] = pic;
-                    if(i == 0 && j == 0) imagesFromGrid[0] = pic; 
                     imagesFromGrid[index] = pic;
                     gridPane.add(new HBox(pic), j, i);
                 }
@@ -200,7 +197,7 @@ public class FXMLGameController implements Initializable {
 	int oneBox = 0;
 	for (int i = 1; i < 9; i++)	
             for (int j = 1; j < 9; j++) {
-		if (game.getBoxColor(i,j) == game.WHITE) {
+     		if (game.getBoxColor(i,j) == game.WHITE) {
                     imagesFromGrid[oneBox].setImage(iconWhite);
                 }else if (game.getBoxColor(i,j) == game.BLACK) {
                     imagesFromGrid[oneBox].setImage(iconBlack);

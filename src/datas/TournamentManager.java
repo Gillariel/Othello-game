@@ -127,9 +127,9 @@ public class TournamentManager extends DbConnect{
         try (NHDatabaseSession session = getDb()){
             String[][] result = session.createStatement("SELECT leftContender, rightContender "
                     + "FROM Games "
-                    + "WHERE _priority = (SELECT Min(_priority) "
+                    + "WHERE winner IS NULL AND _priority = (SELECT Min(_priority) "
                                       + "FROM Games "
-                                      + "WHERE leftContender != '?' AND winner IS NULL);")
+                                      + "WHERE winner IS NULL);")
                     .executeQuery();
             for(String[] g : result) 
                 games.add(new Pair<String,String>(g[0], g[1]));
@@ -206,14 +206,14 @@ public class TournamentManager extends DbConnect{
     
     public int generateNextTurn() {
         try (NHDatabaseSession session = getDb()){
-            getDb().openTransaction();
+            session.openTransaction();
             
             int turn = selectCurrentPriority();
             
             List<Game> futureGames = new ArrayList<>();
             String[][] result = session.createStatement("SELECT id, leftContender, rightContender, _priority "
                     + "FROM Games "
-                    + "WHERE _priority = @priority")
+                    + "WHERE _priority = @priority; ")
                     .bindParameter("@priority", turn + 1)
                     .executeQuery();
             for(String[] g : result)
@@ -222,7 +222,7 @@ public class TournamentManager extends DbConnect{
             List<Game> lastGames = new ArrayList<>();
             String[][] result2 = session.createStatement("SELECT id, leftContender, rightContender, _priority "
                     + "FROM Games "
-                    + "WHERE _priority = @priority")
+                    + "WHERE _priority = @priority; ")
                     .bindParameter("@priority", turn)
                     .executeQuery();
             for(String[] ga : result)
@@ -235,21 +235,24 @@ public class TournamentManager extends DbConnect{
             for(int i = 0; i < lastGames.size(); i++) {
                 if(i%2 == 0){
                     currentLeft = lastGames.get(i).getWinner();
-                }else if(i%2 == 1){
+                }else{
                     currentRight = lastGames.get(i).getWinner();
-                }else if(currentLeft != "" && currentRight != ""){
+                }
+                if(currentLeft != "" && currentRight != ""){
                     id_futureGame = futureGames.get(i/2).getId();
                     resultFromUpdate += updateGame(id_futureGame, currentLeft, currentRight);
                 }
             }
             
-            if(resultFromUpdate > 0){
-                getDb().rollback();
-            }else{
-                getDb().commit();
-            }
+            //if(resultFromUpdate > 0){
+              //  getDb().rollback();
+            //}else{
+                session.commit();
+                System.out.println(session.getLastError());
+            //}
             return resultFromUpdate;
         }catch (Exception e) {
+            
             return -1;
         }
     }
@@ -258,7 +261,7 @@ public class TournamentManager extends DbConnect{
         try(NHDatabaseSession session = getDb()){
             int result = session.createStatement("UPDATE Games "
                     + "SET leftContender = @J1, rightContender = @J2 "
-                    + "WHERE id LIKE @id;")
+                    + "WHERE id = @id; ")
                     .bindParameter("@J1", currentLeft)
                     .bindParameter("@J2", currentRight)
                     .bindParameter("@id", id)

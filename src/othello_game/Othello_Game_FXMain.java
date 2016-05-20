@@ -42,9 +42,4 @@ public class Othello_Game_FXMain extends Application {
     public static void main(String[] args) {
         launch(args);
     }
-    
-    private boolean controllerFileExists(String name){
-        File file = new File(name + ".sav");
-        return file.exists();
-    }
 }
