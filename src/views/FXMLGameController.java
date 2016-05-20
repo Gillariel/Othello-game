@@ -123,8 +123,8 @@ public class FXMLGameController implements Initializable {
                 }
                 else {
                     ImageView pic = new ImageView(iconEmpty);
-                    if(i == 0) imagesFromGrid[j] = pic;
-                    if(j == 0) imagesFromGrid[i] = pic;
+                    if(i == 0) imagesFromGrid[i] = pic;
+                    if(j == 0) imagesFromGrid[j] = pic;
                     if(i == 0 && j == 0) imagesFromGrid[0] = pic; 
                     imagesFromGrid[index] = pic;
                     gridPane.add(new HBox(pic), j, i);
@@ -162,10 +162,11 @@ public class FXMLGameController implements Initializable {
         for(int i = 1; i < 9; i++) 
             for(int j = 1; j < 9; j++)        
                 if(game.getPossibleHits()[i][j])
-                    if(game.getCurrentPlayer() == 1)
+                    if(game.getCurrentPlayer() == 1){
                         imagesFromGrid[game.getBoxNumber(i, j)].setImage(iconBlackPossibility);
-                    else
+                    }else{
                         imagesFromGrid[game.getBoxNumber(i, j)].setImage(iconWhitePossibility);
+                    }
     }
     
     private void showCurrentPlayer() {
@@ -199,19 +200,18 @@ public class FXMLGameController implements Initializable {
 	int oneBox = 0;
 	for (int i = 1; i < 9; i++)	
             for (int j = 1; j < 9; j++) {
-		if (game.getBoxColor(i,j) == game.WHITE) 
+		if (game.getBoxColor(i,j) == game.WHITE) {
                     imagesFromGrid[oneBox].setImage(iconWhite);
-                else if (game.getBoxColor(i,j) == game.BLACK) 
+                }else if (game.getBoxColor(i,j) == game.BLACK) {
                     imagesFromGrid[oneBox].setImage(iconBlack);
-		else if (game.getBoxColor(i, j) == game.TAKE_BY_BLACK) {
+                }else if (game.getBoxColor(i, j) == game.TAKE_BY_BLACK) {
                     game.setSpecificBox(i,j, game.BLACK);
                     imagesFromGrid[oneBox].setImage(iconBlack);
 		}else if (game.getBoxColor(i,j) == game.TAKE_BY_WHITE) {
                     game.setSpecificBox(i, j, game.WHITE);
                     imagesFromGrid[oneBox].setImage(iconWhite);
                 }else if (game.getBoxColor(i, j) == game.EMPTY)
-                    imagesFromGrid[oneBox].setImage(iconEmpty);
-				
+                    imagesFromGrid[oneBox].setImage(iconEmpty);	
 		oneBox++;
             }
     }

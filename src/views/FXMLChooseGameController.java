@@ -51,16 +51,40 @@ public class FXMLChooseGameController implements Initializable {
                 if(p != null)
                     comboBoxGames.getItems().add(p);
                 else
-                    if(MyDialog.confirmationDialog("Next Turn", "No games left", "Do you want ti generate the next turn?"))
+                    if(MyDialog.confirmationDialog("Next Turn", "No games left", "Do you want ti generate the next turn?")) {
                         provider.generateNextTurn();
+                        for(Pair<String,String> pr : provider.selectAllVsContenders())
+                            comboBoxGames.getItems().add(pr);
+                    }
                     else
                         Platform.exit();
     }    
 
     @FXML
     private void handle_btn_play(ActionEvent event) {
-        if(comboBoxGames.getSelectionModel().isEmpty())
+        if(comboBoxGames.getSelectionModel().isEmpty()){
             MyDialog.warningDialog("Warning", "You need to chosse one game before playing !");
+            try{
+                FXMLLoader loaderFXML = new FXMLLoader(getClass().getResource("/views/FXMLGame.fxml"));
+                Parent root = (Parent) loaderFXML.load();
+                FXMLGameController controller = loaderFXML.getController();
+                Scene scene = new Scene(root);
+                scene.getStylesheets().add(getClass().getResource("/ressources/ProgressBar.css").toExternalForm());
+                Stage stage = new Stage();
+                stage.setScene(scene);
+                stage.getIcons().add(new Image("http://swap.sec.net/annex/icon.png"));
+                stage.centerOnScreen();
+                stage.setResizable(false);
+                stage.setFullScreen(true);
+                stage.setTitle("Othello - Game");
+                setOnCloseRequest(stage, controller);
+                controller.setStage(stage);
+                stage.show();
+                this.stage.close();
+            }catch(IOException e) {
+                MyDialog.warningDialog("Warning", "Error while loading the game window, please try again.");
+            }
+        }
         else{
             TournamentManager provider = new TournamentManager();
             Game game = provider.selectGame(comboBoxGames.getSelectionModel().getSelectedItem().getKey());
